@@ -1,0 +1,93 @@
+// variables.scss
+$primary-color: #3880ff;
+$secondary-color: #ff3d00;
+$text-color: #222;
+$background-color: #f4f4f4;
+$header-background: rgba(255, 255, 255, 0.8);
+$border-radius: 8px;
+
+// global.scss
+ion-header {
+  background: $header-background;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+ion-toolbar {
+  --background: $header-background;
+  --color: $text-color;
+}
+
+ion-content {
+  background-color: $background-color;
+}
+
+ion-item {
+  background-color: #fff;
+  border-radius: $border-radius;
+  margin: 8px 0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+  }
+
+  ion-label {
+    color: $text-color;
+    font-weight: bold;
+  }
+
+  ion-select,
+  ion-datetime {
+    --background: $background-color;
+    --color: $text-color;
+    --border-radius: $border-radius;
+    --padding-start: 10px;
+  }
+}
+
+ion-button {
+  --background: $primary-color;
+  --color: #fff;
+  border-radius: $border-radius;
+  margin: 16px 0;
+  transition: background 0.3s;
+
+  &:hover {
+    background: darken($primary-color, 10%);
+  }
+}
+
+ion-list {
+  margin-top: 16px;
+  ion-item {
+    background-color: #fff;
+    border-radius: $border-radius;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    transition: background 0.2s;
+
+    &:hover {
+      background: $secondary-color;
+      color: white;
+
+      h2 {
+        color: white;
+      }
+    }
+
+    h2 {
+      font-size: 1.2em;
+      margin: 0;
+      color: $text-color;
+    }
+
+    p {
+      font-size: 0.9em;
+      color: darken($text-color, 20%);
+    }
+    .logo {
+        height: 40px; // Ajusta la altura del logo
+        margin-right: 10px; // Espacio a la derecha del logo
+    }
+  }
+}

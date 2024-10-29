@@ -1,0 +1,30 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Historial de Viajes</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ion-list *ngIf="trips.length > 0 || services.length > 0; else noData">
+    <!-- Lista de Viajes -->
+    <ion-item *ngFor="let trip of trips">
+      <ion-label>
+        <h2>Fecha: {{ trip.date }}</h2>
+        <p>Camión: {{ trip.truckType }} - Estado: {{ trip.status }}</p>
+      </ion-label>
+    </ion-item>
+
+    <!-- Lista de Servicios -->
+    <ion-item *ngFor="let service of services">
+      <ion-label>
+        <h2>Camión: {{ service.truck_type | uppercase }}</h2>
+        <p>Fecha: {{ service.date }} - Hora: {{ service.time }}</p>
+      </ion-label>
+    </ion-item>
+  </ion-list>
+
+  <!-- Mensaje cuando no hay datos -->
+  <ng-template #noData>
+    <p>No tienes viajes ni servicios registrados aún.</p>
+  </ng-template>
+</ion-content>

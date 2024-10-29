@@ -1,0 +1,52 @@
+ion-header {
+    background-color: #3880c7; // Color de fondo para el encabezado
+    ion-toolbar {
+      color: white; // Color del texto en el toolbar
+    }
+  }
+  
+  ion-content {
+    padding: 16px; // Espaciado interno del contenido
+  
+    ion-item {
+      margin-bottom: 16px; // Espaciado entre los elementos de la lista
+  
+      ion-label {
+        font-weight: bold; // Texto en negrita para etiquetas
+      }
+    }
+  
+    ion-button {
+      margin-top: 20px; // Espaciado en la parte superior del botón
+      background-color: #10dc60; // Color de fondo para el botón
+      color: white; // Color del texto en el botón
+      border-radius: 8px; // Bordes redondeados para el botón
+    }
+  
+    ion-list {
+      margin-top: 20px; // Espaciado superior para la lista de servicios
+  
+      ion-item {
+        background-color: #f8f8f8; // Color de fondo para los elementos de la lista
+        border-radius: 8px; // Bordes redondeados para los elementos de la lista
+        transition: background-color 0.3s; // Transición suave para el cambio de color
+  
+        &:hover {
+          background-color: #e0e0e0; // Color de fondo al pasar el ratón
+        }
+  
+        ion-label {
+          h2 {
+            font-size: 18px; // Tamaño de fuente para el título
+            margin: 0; // Sin margen
+          }
+  
+          p {
+            font-size: 14px; // Tamaño de fuente para la descripción
+            color: #666; // Color para la descripción
+          }
+        }
+      }
+    }
+  }
+  

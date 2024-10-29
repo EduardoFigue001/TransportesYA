@@ -25,3 +25,23 @@
 #container a {
   text-decoration: none;
 }
+.vision-section {
+  padding: 16px;
+  background-color: #f8f8f8; // Color de fondo ligero
+  border-radius: 8px;
+  margin: 16px;
+
+  h2 {
+    font-size: 24px;
+    margin-bottom: 8px;
+    text-align: center;
+    color: #333; // Color del texto
+  }
+
+  p {
+    font-size: 16px;
+    text-align: center;
+    color: #666; // Color del texto secundario
+    line-height: 1.5;
+  }
+}

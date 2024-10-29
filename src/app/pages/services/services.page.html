@@ -1,0 +1,46 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Seleccionar Servicio</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-item>
+    <ion-label>Tipo de camión</ion-label>
+    <ion-select [(ngModel)]="selectedTruck" placeholder="Selecciona una opción">
+      <ion-select-option value="small">Camión Pequeño (S)</ion-select-option>
+      <ion-select-option value="medium">Camión Mediano (M)</ion-select-option>
+      <ion-select-option value="large">Camión Grande (L)</ion-select-option>
+      <ion-select-option value="extra_large">Camión Extra Grande (XL)</ion-select-option>
+    </ion-select>
+  </ion-item>
+
+  <ion-item>
+    <ion-label>Fecha del Servicio</ion-label>
+    <ion-datetime displayFormat="DD MMMM YYYY" [(ngModel)]="selectedDate"></ion-datetime>
+  </ion-item>
+
+  <ion-item>
+    <ion-label>Hora del Servicio</ion-label>
+    <ion-datetime displayFormat="HH:mm" pickerFormat="HH:mm" [(ngModel)]="selectedTime"></ion-datetime>
+  </ion-item>
+
+  <ion-button expand="full" (click)="scheduleService()">Agendar Servicio</ion-button>
+
+  <ion-header>
+    <ion-toolbar>
+      <ion-title>Servicios</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <ion-content class="ion-padding">
+    <ion-list>
+      <ion-item *ngFor="let service of services" (click)="bookService(service)">
+        <ion-label>
+          <h2>{{ service.truckType }}</h2>
+          <p>{{ service.description }}</p>
+        </ion-label>
+      </ion-item>
+    </ion-list>
+  </ion-content>
+</ion-content>
