@@ -6,6 +6,9 @@ import { environment } from 'src/environments/environment';
   providedIn: 'root'
 })
 export class SupabaseService {
+  createService(serviceData: { user_id: any; truck_type: string; date: string; time: string; }): { error: any; } | PromiseLike<{ error: any; }> {
+    throw new Error('Method not implemented.');
+  }
   createUser(userData: { user_id: string; role: string; email: string; password: string; name: string | null; birth_date: string | null; address: string | null; truck_model: string | null; truck_year: number | null; truck_license_plate: string | null; }) {
     throw new Error('Method not implemented.');
   }

@@ -1,26 +1,41 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>
-      TransportesYa
-    </ion-title>
+    <ion-title>TransportesYa</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
+<ion-content [fullscreen]="true" class="ion-padding">
   <ion-header collapse="condense">
     <ion-toolbar>
       <ion-title size="large">Blank</ion-title>
     </ion-toolbar>
   </ion-header>
 
-  
+  <!-- Sección de bienvenida -->
+  <h2>Bienvenido a TransportesYa</h2>
+  <p>Selecciona un servicio o navega por el menú para ver tu perfil y más opciones.</p>
 
+  <ion-button expand="full" routerLink="/services">Ver Servicios Disponibles</ion-button>
+
+  <!-- Mostrar el servicio agendado si existe -->
+  <div *ngIf="scheduledService">
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Tienes agendado el siguiente servicio:</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <p>Camión: {{ scheduledService.truck_type }}</p>
+        <p>Fecha: {{ scheduledService.date }}</p>
+        <p>Hora: {{ scheduledService.time }}</p>
+      </ion-card-content>
+    </ion-card>
+  </div>
+
+  <!-- Sección de visión -->
   <div class="vision-section">
     <h2>Nuestra Visión</h2>
     <p>
       En TransportesYa, nuestro objetivo es proporcionar un servicio de mudanzas eficiente y accesible para todos. Nos esforzamos por conectar a nuestros usuarios con los transportistas adecuados, garantizando una experiencia sin complicaciones y confiable.
     </p>
   </div>
-
-  
 </ion-content>

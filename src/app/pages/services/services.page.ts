@@ -53,21 +53,28 @@ export class IntegratedPage implements OnInit {
       return;
     }
 
-    // Suponiendo que tienes un método para obtener el ID del usuario actual
-const userId = "el-id-del-usuario-actual"; // Debes reemplazar esto con la lógica para obtener el ID del usuario actual
-const user = await this.supabaseService.getUserProfile(userId);
-const serviceData = {
-  user_id: user.id,  // Asegúrate de que 'user' tenga la propiedad 'id'
-  truck_type: this.selectedTruck,
-  date: this.selectedDate,
-  time: this.selectedTime,
-};
+    // Obtener el ID del usuario actual
+    const userId = "el-id-del-usuario-actual"; // Debes reemplazar esto con la lógica para obtener el ID del usuario actual
+    const user = await this.supabaseService.getUserProfile(userId);
+
+    const serviceData = {
+      user_id: user.id, // Asegúrate de que 'user' tenga la propiedad 'id'
+      truck_type: this.selectedTruck,
+      date: this.selectedDate,
+      time: this.selectedTime,
+    };
 
     try {
+      // Guardar el servicio en Supabase
       const { error } = await this.supabaseService.createService(serviceData);
       if (error) throw error;
+
+      // Guardar el servicio en localStorage para mostrar en el inicio
+      localStorage.setItem('scheduledService', JSON.stringify(serviceData));
+
       alert('Servicio agendado con éxito');
-      this.router.navigate(['/historial']);
+      // Redirigir al usuario a la página de inicio
+      this.router.navigate(['/home']);
     } catch (error: any) {
       alert('Error al agendar el servicio: ' + error.message);
     }
