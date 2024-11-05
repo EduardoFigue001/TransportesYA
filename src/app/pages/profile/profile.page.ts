@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { SupabaseService } from 'src/app/services/supabase.service';
-import { ActivatedRoute } from '@angular/router';
-import { Session } from '@supabase/supabase-js';  // Importa el tipo Session
+import { ActivatedRoute, Router } from '@angular/router';
+import { Session } from '@supabase/supabase-js';
 
 @Component({
   selector: 'app-profile',
@@ -9,40 +9,55 @@ import { Session } from '@supabase/supabase-js';  // Importa el tipo Session
   styleUrls: ['./profile.page.scss'],
 })
 export class ProfilePage implements OnInit {
-  user: any = {};  // Aquí almacenaremos los detalles del usuario
+  user: any = {};
   userId: string | null = null;
 
   constructor(
     private supabaseService: SupabaseService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private router: Router
   ) {}
 
   async ngOnInit() {
-    // Obtener el parámetro de la URL (si existe)
+    // Obtener el ID de usuario de los parámetros de la ruta
     this.userId = this.route.snapshot.paramMap.get('id');
 
-    // Si el userId está presente en la URL, obtenemos el perfil del usuario
+    // Cargar el perfil del usuario si se proporciona un ID
     if (this.userId) {
       this.user = await this.supabaseService.getUserProfile(this.userId);
     }
   }
 
   async ionViewWillEnter() {
-    // Obtenemos la sesión activa
+    // Obtener la sesión actual del usuario
     const session: Session | null = await this.supabaseService.getSession();
 
-    // Verificamos si hay una sesión activa y si hay un usuario logueado
+    // Si hay una sesión activa, cargar los detalles del usuario
     if (session?.user?.id) {
-      // Obtenemos los detalles del usuario si hay sesión
       this.user = await this.supabaseService.getUserDetails(session.user.id);
     } else {
-      // Manejar el caso cuando no hay usuario logueado o sesión activa
       console.error('No hay sesión activa o el usuario no está logueado.');
+      this.router.navigate(['/login']); // Redirigir al login si no hay sesión activa
     }
   }
 
   async uploadProfileImage() {
-    // Lógica para subir imagen de perfil
-    // Podrías abrir el selector de archivos o usar la cámara si está disponible
+    // Lógica para subir imagen de perfil (por implementar)
+  }
+
+  async logout() {
+    try {
+      await this.supabaseService.signOut();
+      this.router.navigate(['/login']); // Redirigir al usuario a la página de inicio de sesión
+    } catch (error) {
+      console.error('Error al cerrar sesión:', error);
+    }
+  }
+
+  getProfileImage(): string {
+    // Retornar la imagen de perfil según el rol del usuario
+    return this.user.role === 'chofer'
+      ? this.user.profileImage || 'assets/icon/camion.png'
+      : this.user.profileImage || 'assets/icon/cliente.png';
   }
 }

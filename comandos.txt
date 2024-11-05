@@ -1,0 +1,3 @@
+ionic cap add android 
+ionic build -c development
+ionic cap sync android 

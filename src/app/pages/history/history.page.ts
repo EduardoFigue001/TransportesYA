@@ -11,7 +11,7 @@ export class HistoryPage implements OnInit {
   trips: any[] = [];
   services: Service[] = []; // Declarar services como un array de Service
 
-  constructor(private supabaseService: SupabaseService) {}
+  constructor(private readonly supabaseService: SupabaseService) {}
 
   async ngOnInit() {
     const session = await this.supabaseService.getSession();
