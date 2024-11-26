@@ -3,33 +3,33 @@
   <ion-menu side="start" menuId="main-menu" contentId="main-content">
     <ion-header>
       <ion-toolbar color="primary">
-        <ion-title>Menú</ion-title>
+        <ion-title class="menu-title">Menú</ion-title>
       </ion-toolbar>
     </ion-header>
 
     <ion-content>
       <ion-list>
-        <ion-item routerLink="/home" lines="none">
+        <ion-item routerLink="/home" lines="none" detail="false" class="menu-item">
           <ion-icon name="home-outline" slot="start"></ion-icon>
           <ion-label>Inicio</ion-label>
         </ion-item>
 
-        <ion-item routerLink="/profile" lines="none">
+        <ion-item routerLink="/profile" lines="none" detail="false" class="menu-item">
           <ion-icon name="person-outline" slot="start"></ion-icon>
           <ion-label>Mi Perfil</ion-label>
         </ion-item>
 
-        <ion-item routerLink="/history" lines="none">
+        <ion-item routerLink="/history" lines="none" detail="false" class="menu-item">
           <ion-icon name="time-outline" slot="start"></ion-icon>
           <ion-label>Historial de Viajes</ion-label>
         </ion-item>
 
-        <ion-item routerLink="/services" lines="none" routerLinkActive="active-link">
+        <ion-item routerLink="/services" lines="none" routerLinkActive="active-link" class="menu-item">
           <ion-icon name="construct-outline" slot="start"></ion-icon>
           <ion-label>Servicios</ion-label>
         </ion-item>
 
-        <ion-item (click)="logout()" lines="none">
+        <ion-item (click)="logout()" lines="none" class="menu-item">
           <ion-icon name="log-out-outline" slot="start"></ion-icon>
           <ion-label>Cerrar Sesión</ion-label>
         </ion-item>
@@ -40,13 +40,11 @@
   <!-- Contenido principal -->
   <div class="ion-page" id="main-content">
     <ion-header>
-      <ion-toolbar>
+      <ion-toolbar color="primary">
         <ion-buttons slot="start">
           <ion-menu-button menu="main-menu"></ion-menu-button>
         </ion-buttons>
-        <img src="https://mudanzasyfletes2001.com.ar/wp-content/uploads/favicon-1.png" alt="Logo" style="height: 40px; margin-right: 60px;">
-
-        
+        <img src="https://mudanzasyfletes2001.com.ar/wp-content/uploads/favicon-1.png" alt="Logo" class="logo">
       </ion-toolbar>
     </ion-header>
 
