@@ -3,18 +3,16 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
 
-import { ServicesPageRoutingModule } from './services-routing.module'; // Importar el módulo de rutas
-
-import { ServiceService } from '../services/service.service'; // Importar el servicio
+import { ServicesPageRoutingModule } from './services-routing.module';
+import { ServicesPage } from './services.page';
 
 @NgModule({
-  imports: [
-    CommonModule,
-    FormsModule,
-    IonicModule,
-    ServicesPageRoutingModule // Asegurar la importación del módulo de rutas
-  ],
-  
-  providers: [ServiceService]  // Registrar el servicio en los proveedores
+    imports: [
+        CommonModule,
+        FormsModule,
+        IonicModule,
+        ServicesPageRoutingModule
+    ],
+    declarations: [ServicesPage]
 })
 export class ServicesPageModule {}

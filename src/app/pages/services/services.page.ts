@@ -1,91 +1,104 @@
-import { Component, OnInit } from '@angular/core';
-import { SupabaseService } from 'src/app/services/supabase.service';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Component } from '@angular/core';
+import { SupabaseClient } from '@supabase/supabase-js';
+import { Geolocation } from '@capacitor/geolocation';
 
 @Component({
-  selector: 'app-integrated-page',
-  templateUrl: './integrated.page.html',
-  styleUrls: ['./integrated.page.scss'],
+  selector: 'app-servicios',
+  templateUrl: './servicios.page.html',
+  styleUrls: ['./servicios.page.scss'],
 })
-export class IntegratedPage implements OnInit {
-  // Variables relacionadas con los servicios
-  selectedTruck: string = '';
-  selectedDate: string = '';
-  selectedTime: string = '';
-  services: any[] = [];
+export class ServiciosPage {
+  camiones: any[] = [];
+  selectedCamion: any = null;
+  ubicacionInicio: string = '';
+  ubicacionFin: string = '';
+  supabase: SupabaseClient;
 
-  // Variables relacionadas con el perfil del usuario
-  user: any = {};
-  userId: string | null = null;
+  // Configuración del mapa
+  center: google.maps.LatLngLiteral = { lat: 19.432608, lng: -99.133209 }; // Ubicación inicial (CDMX)
+  zoom = 12;
+  startMarker: google.maps.LatLngLiteral | null = null;
+  endMarker: google.maps.LatLngLiteral | null = null;
 
-  constructor(
-    private supabaseService: SupabaseService,
-    private router: Router,
-    private route: ActivatedRoute
-  ) {}
-
-  async ngOnInit() {
-    // Obtener userId desde las rutas para la parte de perfil
-    this.userId = this.route.snapshot.paramMap.get('id');
-    if (this.userId) {
-      this.user = await this.supabaseService.getUserProfile(this.userId);
-    }
-
-    // Cargar servicios disponibles al inicializar la página
-    this.services = await this.supabaseService.getServices();
+  constructor() {
+    this.supabase = new SupabaseClient(
+      'https://tbttriwluxapxmukdgcj.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRidHRyaXdsdXhhcHhtdWtkZ2NqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mjk1ODMzNTMsImV4cCI6MjA0NTE1OTM1M30.IELjZnoWXXcBz6OJTF5JLYyKFBW5Op3yb0YCoe6cYoU'
+    );
+    this.getCamiones();
   }
 
-  async ionViewWillEnter() {
-    // Cargar la información del perfil basado en la sesión activa
-    const session = await this.supabaseService.getSession();
-    if (session?.user?.id) {
-      this.user = await this.supabaseService.getUserProfile(session.user.id);
+  // Obtener lista de camiones desde Supabase
+  async getCamiones() {
+    const { data, error } = await this.supabase.from('camiones').select('*');
+    if (!error) {
+      this.camiones = data;
+    } else {
+      console.error(error);
     }
-
-    // Cargar servicios nuevamente al entrar a la vista
-    this.services = await this.supabaseService.getServices();
   }
 
-  async scheduleService() {
-    // Lógica para agendar un servicio
-    if (!this.selectedTruck || !this.selectedDate || !this.selectedTime) {
-      alert('Por favor, completa todos los campos.');
-      return;
-    }
+  // Seleccionar camión
+  seleccionarCamion(camion: any) {
+    this.selectedCamion = camion;
+  }
 
-    // Obtener el ID del usuario actual
-    const userId = "el-id-del-usuario-actual"; // Debes reemplazar esto con la lógica para obtener el ID del usuario actual
-    const user = await this.supabaseService.getUserProfile(userId);
-
-    const serviceData = {
-      user_id: user.id, // Asegúrate de que 'user' tenga la propiedad 'id'
-      truck_type: this.selectedTruck,
-      date: this.selectedDate,
-      time: this.selectedTime,
-    };
-
+  // Obtener ubicación actual usando GPS
+  async obtenerUbicacion() {
     try {
-      // Guardar el servicio en Supabase
-      const { error } = await this.supabaseService.createService(serviceData);
-      if (error) throw error;
-
-      // Guardar el servicio en localStorage para mostrar en el inicio
-      localStorage.setItem('scheduledService', JSON.stringify(serviceData));
-
-      alert('Servicio agendado con éxito');
-      // Redirigir al usuario a la página de inicio
-      this.router.navigate(['/home']);
-    } catch (error: any) {
-      alert('Error al agendar el servicio: ' + error.message);
+      const coordinates = await Geolocation.getCurrentPosition();
+      console.log('Ubicación:', coordinates);
+      this.ubicacionInicio = `${coordinates.coords.latitude} ${coordinates.coords.longitude}`;
+      this.center = {
+        lat: coordinates.coords.latitude,
+        lng: coordinates.coords.longitude,
+      };
+      alert(`Ubicación actual obtenida: ${this.ubicacionInicio}`);
+    } catch (error) {
+      console.error('Error al obtener ubicación:', error);
+      alert('No se pudo obtener la ubicación. Verifica los permisos.');
     }
   }
 
-  bookService(service: any) {
-    // Lógica para reservar el servicio seleccionado
-    console.log('Servicio reservado:', service);
+  // Manejar clics en el mapa para definir ubicaciones de inicio y destino
+  onMapClick(event: google.maps.MapMouseEvent) {
+    if (!this.startMarker) {
+      this.startMarker = event.latLng?.toJSON() || null;
+      this.ubicacionInicio = `${this.startMarker.lat}, ${this.startMarker.lng}`;
+    } else if (!this.endMarker) {
+      this.endMarker = event.latLng?.toJSON() || null;
+      this.ubicacionFin = `${this.endMarker.lat}, ${this.endMarker.lng}`;
+    }
   }
 
-  async uploadProfileImage() {
-    // Lógica para subir imagen de perfil
+  // Guardar el viaje en Supabase
+  async guardarViaje(event: Event) {
+    event.preventDefault();
+
+    const clienteId = 'ID_DEL_USUARIO'; // Reemplaza con el ID del cliente autenticado
+    const { data, error } = await this.supabase.from('historial_viajes').insert({
+      cliente_id: clienteId,
+      camion_id: this.selectedCamion.id,
+      ubicacion_inicio: `POINT(${this.ubicacionInicio})`,
+      ubicacion_fin: `POINT(${this.ubicacionFin})`,
+    });
+
+    if (!error) {
+      console.log('Viaje guardado:', data);
+      alert('El servicio se guardó exitosamente.');
+      this.resetFormulario();
+    } else {
+      console.error(error);
+      alert('Hubo un error al guardar el servicio.');
+    }
+  }
+
+  // Reiniciar el formulario
+  resetFormulario() {
+    this.selectedCamion = null;
+    this.ubicacionInicio = '';
+    this.ubicacionFin = '';
+    this.startMarker = null;
+    this.endMarker = null;
   }
 }

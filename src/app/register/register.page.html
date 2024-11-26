@@ -5,57 +5,90 @@
 </ion-header>
 
 <ion-content>
-  <ion-item>
-    <ion-label position="floating">Correo Electrónico</ion-label>
-    <ion-input [(ngModel)]="email" type="email" required></ion-input>
-  </ion-item>
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Regístrate en TransportesYA</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <form (submit)="registrarUsuario($event)">
+        <!-- Selección de rol -->
+        <ion-item>
+          <ion-label>Rol</ion-label>
+          <ion-select [(ngModel)]="rolSeleccionado" placeholder="Selecciona un rol" name="rol">
+            <ion-select-option value="cliente">Cliente</ion-select-option>
+            <ion-select-option value="chofer">Chofer</ion-select-option>
+          </ion-select>
+        </ion-item>
 
-  <ion-item>
-    <ion-label position="floating">Contraseña</ion-label>
-    <ion-input [(ngModel)]="password" type="password" required></ion-input>
-  </ion-item>
+        <!-- Campos comunes -->
+        <ion-item>
+          <ion-label>Nombre completo</ion-label>
+          <ion-input type="text" [(ngModel)]="nombre" name="nombre" required></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label>Correo electrónico</ion-label>
+          <ion-input type="email" [(ngModel)]="correo" name="correo" required></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label>Clave</ion-label>
+          <ion-input type="password" [(ngModel)]="clave" name="clave" required></ion-input>
+        </ion-item>
 
-  <!-- Selección del rol (cliente o chofer) -->
-  <ion-item>
-    <ion-label>¿Eres cliente o chofer?</ion-label>
-    <ion-select [(ngModel)]="role" placeholder="Selecciona tu rol" required>
-      <ion-select-option value="cliente">Cliente</ion-select-option>
-      <ion-select-option value="chofer">Chofer</ion-select-option>
-    </ion-select>
-  </ion-item>
+        <!-- Campos específicos para Cliente -->
+        <div *ngIf="rolSeleccionado === 'cliente'">
+          <ion-item>
+            <ion-label>Dirección</ion-label>
+            <ion-input type="text" [(ngModel)]="direccion" name="direccion" required></ion-input>
+          </ion-item>
+          <ion-item>
+            <ion-label>País</ion-label>
+            <ion-input type="text" [(ngModel)]="pais" name="pais" required></ion-input>
+          </ion-item>
+          <ion-item>
+            <ion-label>Región</ion-label>
+            <ion-input type="text" [(ngModel)]="region" name="region" required></ion-input>
+          </ion-item>
+        </div>
 
-  <!-- Campos adicionales para Cliente -->
-  <ion-item *ngIf="role === 'cliente'">
-    <ion-label position="floating">Nombre Completo</ion-label>
-    <ion-input [(ngModel)]="name" required></ion-input>
-  </ion-item>
+        <!-- Campos específicos para Chofer -->
+        <div *ngIf="rolSeleccionado === 'chofer'">
+          <ion-item>
+            <ion-label>Tipo de camión</ion-label>
+            <ion-select [(ngModel)]="tipoCamion" name="tipoCamion" required>
+              <ion-select-option value="S">S</ion-select-option>
+              <ion-select-option value="M">M</ion-select-option>
+              <ion-select-option value="L">L</ion-select-option>
+              <ion-select-option value="XL">XL</ion-select-option>
+            </ion-select>
+          </ion-item>
+          <ion-item>
+            <ion-label>Patente</ion-label>
+            <ion-input type="text" [(ngModel)]="patente" name="patente" required></ion-input>
+          </ion-item>
+          <ion-item>
+            <ion-label>Modelo del camión</ion-label>
+            <ion-input type="text" [(ngModel)]="modeloCamion" name="modeloCamion" required></ion-input>
+          </ion-item>
+          <ion-item>
+            <ion-label>Año</ion-label>
+            <ion-input type="number" [(ngModel)]="anioCamion" name="anioCamion" required></ion-input>
+          </ion-item>
+          <ion-item>
+            <ion-label>Región</ion-label>
+            <ion-input type="text" [(ngModel)]="region" name="region" required></ion-input>
+          </ion-item>
+          <ion-item>
+            <ion-label>Dirección</ion-label>
+            <ion-input type="text" [(ngModel)]="direccion" name="direccion" required></ion-input>
+          </ion-item>
+          <ion-item>
+            <ion-label>País</ion-label>
+            <ion-input type="text" [(ngModel)]="pais" name="pais" required></ion-input>
+          </ion-item>
+        </div>
 
-  <ion-item *ngIf="role === 'cliente'">
-    <ion-label>Fecha de Nacimiento</ion-label>
-    <ion-datetime [(ngModel)]="birthDate" required></ion-datetime>
-  </ion-item>
-
-  <ion-item *ngIf="role === 'cliente'">
-    <ion-label position="floating">Dirección</ion-label>
-    <ion-input [(ngModel)]="address" required></ion-input>
-  </ion-item>
-
-  <!-- Campos adicionales para Chofer -->
-  <ion-item *ngIf="role === 'chofer'">
-    <ion-label position="floating">Modelo del Camión</ion-label>
-    <ion-input [(ngModel)]="truckModel" required></ion-input>
-  </ion-item>
-
-  <ion-item *ngIf="role === 'chofer'">
-    <ion-label position="floating">Año del Camión</ion-label>
-    <ion-input [(ngModel)]="truckYear" type="number" required></ion-input>
-  </ion-item>
-
-  <ion-item *ngIf="role === 'chofer'">
-    <ion-label position="floating">Patente del Camión</ion-label>
-    <ion-input [(ngModel)]="truckLicensePlate" required></ion-input>
-  </ion-item>
-
-  <!-- Botón para enviar el formulario -->
-  <ion-button expand="full" (click)="register()">Registrar</ion-button>
+        <ion-button type="submit" expand="block">Registrar</ion-button>
+      </form>
+    </ion-card-content>
+  </ion-card>
 </ion-content>

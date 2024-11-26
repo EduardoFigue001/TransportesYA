@@ -1,24 +1,23 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { IonicModule } from '@ionic/angular'; // Importa el módulo de Ionic
 
-import { IonicModule } from '@ionic/angular';
+import { RouterModule } from '@angular/router';
+import { ServicesPage } from 'src/app/services/services.page';
 
-import { ServicesPageRoutingModule } from './services-routing.module';
-
-import { ServicesPage } from 'src/app/services/services.page'; // Reemplaza 'services.page' con el nombre de tu página
-export interface Service {
-  truck_type: string;
-  date: string;
-  time: string;
-}
 @NgModule({
+  declarations: [ServicesPage],
   imports: [
     CommonModule,
     FormsModule,
-    IonicModule,
-    ServicesPageRoutingModule
+    IonicModule, // Asegúrate de incluir esto
+    RouterModule.forChild([
+      {
+        path: '',
+        component: ServicesPage,
+      },
+    ]),
   ],
-  declarations: [ServicesPage]
 })
 export class ServicesPageModule {}

@@ -16,31 +16,14 @@
   </ion-item>
 
   <ion-item>
-    <ion-label>Fecha del Servicio</ion-label>
-    <ion-datetime displayFormat="DD MMMM YYYY" [(ngModel)]="selectedDate"></ion-datetime>
+    <ion-label>Fecha</ion-label>
+    <ion-datetime displayFormat="DD MMM YYYY" [(ngModel)]="selectedDate"></ion-datetime>
   </ion-item>
 
   <ion-item>
-    <ion-label>Hora del Servicio</ion-label>
-    <ion-datetime displayFormat="HH:mm" pickerFormat="HH:mm" [(ngModel)]="selectedTime"></ion-datetime>
+    <ion-label>Hora</ion-label>
+    <ion-datetime displayFormat="HH:mm" pickerFormat="HH mm" [(ngModel)]="selectedTime"></ion-datetime>
   </ion-item>
 
-  <ion-button expand="full" (click)="scheduleService()">Agendar Servicio</ion-button>
-
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Servicios</ion-title>
-    </ion-toolbar>
-  </ion-header>
-
-  <ion-content class="ion-padding">
-    <ion-list>
-      <ion-item *ngFor="let service of services" (click)="bookService(service)">
-        <ion-label>
-          <h2>{{ service.truckType }}</h2>
-          <p>{{ service.description }}</p>
-        </ion-label>
-      </ion-item>
-    </ion-list>
-  </ion-content>
+  <ion-button expand="full" (click)="scheduleService()">Agendar</ion-button>
 </ion-content>

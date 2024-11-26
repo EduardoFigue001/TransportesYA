@@ -45,6 +45,12 @@ ion-header {
             font-size: 14px; // Tamaño de fuente para la descripción
             color: #666; // Color para la descripción
           }
+          .map-container {
+            margin: 16px 0;
+            border-radius: 8px;
+            overflow: hidden;
+          }
+          
         }
       }
     }

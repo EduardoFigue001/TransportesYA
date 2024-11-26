@@ -1,0 +1,56 @@
+ion-content {
+    background-image: url("../../assets/icon/Aplicacion-de-Transporte.jpg");
+    display: flex;
+    justify-content: center; // Centra horizontalmente
+    align-items: center; // Centra verticalmente
+    height: 100vh; // Ocupa toda la altura del dispositivo
+  
+    .login-container {
+      transform: translateX(40px); // Mueve el contenedor 50px hacia la derecha  
+      margin-top: 50px; // Ajusta este valor para moverlo más hacia abajo
+      background: transparent; // Fondo completamente transparente
+      border: 2px solid rgba(5, 5, 5, 0.8); // Borde semitransparente
+      border-radius: 15px;
+      padding: 5%; // Espaciado proporcional al tamaño del contenedor
+      width: 80%; // Ocupa el 90% del ancho de la pantalla
+      max-width: 400px; // Límite máximo para dispositivos más grandes
+      text-align: center; // Centra el contenido
+      display: flex;
+      flex-direction: column; // Alineación vertical de los elementos
+      gap: 15px; // Espaciado entre los elementos internos
+  
+      // Asegura que los campos y botones se adapten
+      ion-item {
+        --background: transparent;
+        border-radius: 8px;
+      }
+  
+      ion-input {
+        font-size: 16px; // Fuente legible en pantallas pequeñas
+      }
+  
+      ion-button {
+        --background: linear-gradient(45deg, #0401cf, #0b66b1);
+        --color: white;
+        border-radius: 8px;
+        font-size: 16px; // Botones legibles en móviles
+      }
+  
+      ion-button[fill="clear"] {
+        --color: #0f47e0;
+        font-size: 14px;
+      }
+    }
+  }
+  
+  @media screen and (max-width: 600px) {
+    .login-container {
+      padding: 10%; // Más espaciado interno en pantallas pequeñas
+      width: 95%; // Más ancho para aprovechar el espacio
+    }
+  
+    ion-button {
+      font-size: 14px; // Ajusta el tamaño de los botones para pantallas pequeñas
+    }
+  }
+  

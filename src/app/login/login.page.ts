@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
+import { LoginService } from './login.service';
 import { Router } from '@angular/router';
-import { SupabaseService } from 'src/app/services/supabase.service';
 
 @Component({
   selector: 'app-login',
@@ -8,25 +8,22 @@ import { SupabaseService } from 'src/app/services/supabase.service';
   styleUrls: ['./login.page.scss'],
 })
 export class LoginPage {
-  email: string = '';
-  password: string = '';
+  email: string = ''; // Define la propiedad email
+  password: string = ''; // Define la propiedad password
 
-  constructor(
-    private supabaseService: SupabaseService,
-    private router: Router
-  ) {}
+  constructor(private readonly loginService: LoginService, private readonly router: Router) {}
 
   async login() {
     try {
-      // Intenta iniciar sesión con el correo y la contraseña proporcionados
-      await this.supabaseService.signIn(this.email, this.password);
-      console.log('Inicio de sesión exitoso');
+      const user = await this.loginService.login(this.email, this.password);
+      console.log('Usuario logueado:', user);
 
-      // Redirige al usuario a la página de inicio
-      this.router.navigate(['/home']);
-    } catch (error) {
-      console.error('Error al iniciar sesión:', error);
-      // Aquí podrías agregar lógica para mostrar un mensaje de error al usuario
+      // Redirigir al perfil del usuario después de un login exitoso
+      if (user?.id) {
+        this.router.navigate(['/profile', user.id]); // Redirigir con el ID del usuario
+      }
+    } catch (error: any) {
+      console.error('Error al iniciar sesión:', error.message);
     }
   }
 }

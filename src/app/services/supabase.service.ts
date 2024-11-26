@@ -1,74 +1,118 @@
 import { Injectable } from '@angular/core';
 import { createClient, SupabaseClient, Session } from '@supabase/supabase-js';
-import { environment } from 'src/environments/environment';
+import { Router } from '@angular/router';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class SupabaseService {
-  private supabase: SupabaseClient;
+  private readonly supabase: SupabaseClient;
 
-  constructor() {
-    this.supabase = createClient(environment.supabaseUrl, environment.supabaseKey);
+  constructor(private readonly router: Router) {
+    this.supabase = createClient(
+      'https://tbttriwluxapxmukdgcj.supabase.co', // Mover a variables de entorno o archivo de configuración
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...' // Mover a variables de entorno
+    );
   }
 
-  // Obtener servicios
-  async getServices() {
-    const { data, error } = await this.supabase
-      .from('services')
-      .select('*');
+  // Método para iniciar sesión y verificar rol en 'choferes' o 'clientes'
+  async signIn(email: string, password: string): Promise<boolean> {
+    try {
+      // Intentar buscar al usuario en la tabla 'clientes'
+      const { data: cliente, error: clienteError } = await this.supabase
+        .from('clientes')
+        .select('*')
+        .eq('correo', email)
+        .eq('clave', password)
+        .single();
 
-    if (error) {
-      console.error('Error al obtener los servicios:', error);
-      return [];
+      if (cliente) {
+        console.log('Usuario autenticado como cliente:', cliente.nombre);
+        this.router.navigate(['./home-cliente']); // Redirigir a la vista de cliente
+        return true;
+      }
+
+      // Intentar buscar al usuario en la tabla 'choferes'
+      const { data: chofer, error: choferError } = await this.supabase
+        .from('choferes')
+        .select('*')
+        .eq('correo', email)
+        .eq('clave', password)
+        .single();
+
+      if (chofer) {
+        console.log('Usuario autenticado como chofer:', chofer.nombre);
+        this.router.navigate(['./home-chofer']); // Redirigir a la vista de chofer
+        return true;
+      }
+
+      // Si no se encontró el usuario en ninguna tabla
+      console.error('Usuario no encontrado o credenciales incorrectas');
+      return false;
+    } catch (err) {
+      console.error('Error inesperado al iniciar sesión:', err);
+      return false;
     }
-    return data;
   }
 
-  // Obtener detalles del usuario por ID
-  async getUserDetails(userId: string) {
-    const { data, error } = await this.supabase
-      .from('users')
-      .select('*')
-      .eq('user_id', userId)
-      .single();
-
-    if (error) {
-      console.error('Error al obtener los detalles del usuario:', error);
-      return null;
-    }
-    return data;
-  }
-
-  // Registro de usuario
-  async signUp(email: string, password: string) {
-    const { data, error } = await this.supabase.auth.signUp({ email, password });
-    if (error) throw error;
-    return data.user;
-  }
-
-  // Login de usuario
-  async signIn(email: string, password: string) {
-    const { data, error } = await this.supabase.auth.signInWithPassword({ email, password });
-    if (error) throw error;
-    return data.user;
-  }
-
-  // Logout
-  async signOut() {
-    const { error } = await this.supabase.auth.signOut();
-    if (error) throw error;
-  }
-
-  // Obtener la sesión
+  // Obtener la sesión del usuario actual
   async getSession(): Promise<Session | null> {
     const { data, error } = await this.supabase.auth.getSession();
-    if (error) throw error;
-    return data.session || null;
+    if (error) {
+      console.error('Error al obtener la sesión:', error.message);
+      return null;
+    }
+    return data.session;
   }
 
-  // Obtener perfil del usuario actual desde 'profiles' (tabla personalizada)
-  async getUserProfile(userId: string) {
-    return this.getUserDetails(userId);
+  // Obtener perfil del usuario
+  public async getUserProfile(
+    userId: string,
+    role: 'chofer' | 'cliente'
+  ): Promise<{ data: any | null; error: any | null }> {
+    const table = role === 'chofer' ? 'choferes' : 'clientes';
+    return this.querySupabase(table, 'id', userId);
+  }
+
+  // Obtener viajes del usuario
+  public async getUserTrips(userId: string, role: 'chofer' | 'cliente'): Promise<{ data: any[] | null; error: any | null }> {
+    const column = role === 'chofer' ? 'chofer_id' : 'cliente_id';
+    return this.querySupabase('viajes', column, userId);
+  }
+
+  // Obtener servicios del usuario
+  public async getUserServices(userId: string, role: 'chofer' | 'cliente'): Promise<{ data: any[] | null; error: any | null }> {
+    const column = role === 'chofer' ? 'chofer_id' : 'cliente_id';
+    return this.querySupabase('services', column, userId);
+  }
+
+  // Método genérico para consultar Supabase
+  public async querySupabase(
+    table: string,
+    filterColumn: string,
+    filterValue: string
+  ): Promise<{ data: any[] | null; error: any | null }> {
+    try {
+      const { data, error } = await this.supabase.from(table).select('*').eq(filterColumn, filterValue);
+
+      if (error) {
+        console.error(`Error al consultar la tabla ${table}:`, error.message);
+        return { data: null, error };
+      }
+      return { data, error: null };
+    } catch (err) {
+      console.error('Error inesperado al consultar Supabase:', err);
+      return { data: null, error: err };
+    }
+  }
+
+  // Método para cerrar sesión
+  public async signOut(): Promise<void> {
+    try {
+      await this.supabase.auth.signOut();
+      console.log('Sesión cerrada correctamente');
+    } catch (err) {
+      console.error('Error al cerrar sesión:', err);
+    }
   }
 }

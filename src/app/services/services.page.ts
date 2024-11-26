@@ -1,4 +1,7 @@
 import { Component, OnInit } from '@angular/core';
+export class ServiciosPage {}
+
+
 
 @Component({
   selector: 'app-services',

@@ -1,46 +1,90 @@
-<ion-header>
+<ion-header [translucent]="true">
   <ion-toolbar>
     <ion-title>Seleccionar Servicio</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
-  <ion-item>
-    <ion-label>Tipo de camión</ion-label>
-    <ion-select [(ngModel)]="selectedTruck" placeholder="Selecciona una opción">
-      <ion-select-option value="small">Camión Pequeño (S)</ion-select-option>
-      <ion-select-option value="medium">Camión Mediano (M)</ion-select-option>
-      <ion-select-option value="large">Camión Grande (L)</ion-select-option>
-      <ion-select-option value="extra_large">Camión Extra Grande (XL)</ion-select-option>
-    </ion-select>
-  </ion-item>
-
-  <ion-item>
-    <ion-label>Fecha del Servicio</ion-label>
-    <ion-datetime displayFormat="DD MMMM YYYY" [(ngModel)]="selectedDate"></ion-datetime>
-  </ion-item>
-
-  <ion-item>
-    <ion-label>Hora del Servicio</ion-label>
-    <ion-datetime displayFormat="HH:mm" pickerFormat="HH:mm" [(ngModel)]="selectedTime"></ion-datetime>
-  </ion-item>
-
-  <ion-button expand="full" (click)="scheduleService()">Agendar Servicio</ion-button>
-
-  <ion-header>
-    <ion-toolbar>
-      <ion-title>Servicios</ion-title>
-    </ion-toolbar>
-  </ion-header>
-
-  <ion-content class="ion-padding">
-    <ion-list>
-      <ion-item *ngFor="let service of services" (click)="bookService(service)">
-        <ion-label>
-          <h2>{{ service.truckType }}</h2>
-          <p>{{ service.description }}</p>
-        </ion-label>
+<ion-content [fullscreen]="true" class="ion-padding">
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Detalles del Servicio</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-item>
+        <ion-label>Tipo de camión</ion-label>
+        <ion-select [(ngModel)]="selectedTruck" placeholder="Selecciona una opción">
+          <ion-select-option value="small">Camión Pequeño (S)</ion-select-option>
+          <ion-select-option value="medium">Camión Mediano (M)</ion-select-option>
+          <ion-select-option value="large">Camión Grande (L)</ion-select-option>
+          <ion-select-option value="extra_large">Camión Extra Grande (XL)</ion-select-option>
+        </ion-select>
       </ion-item>
-    </ion-list>
-  </ion-content>
+
+      <ion-item>
+        <ion-label>Fecha</ion-label>
+        <ion-datetime displayFormat="DD MMM YYYY" [(ngModel)]="selectedDate"></ion-datetime>
+      </ion-item>
+
+      <ion-item>
+        <ion-label>Hora</ion-label>
+        <ion-datetime displayFormat="HH:mm" pickerFormat="HH:mm" [(ngModel)]="selectedTime"></ion-datetime>
+      </ion-item>
+    </ion-card-content>
+  </ion-card>
+
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Ubicación</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <div class="map-container">
+        <google-map
+          height="300px"
+          width="100%"
+          [center]="center"
+          [zoom]="zoom"
+          (mapClick)="onMapClick($event)"
+        >
+          <map-marker
+            *ngIf="startMarker"
+            [position]="startMarker"
+            title="Inicio"
+            icon="http://maps.google.com/mapfiles/ms/icons/blue-dot.png"
+          ></map-marker>
+
+          <map-marker
+            *ngIf="endMarker"
+            [position]="endMarker"
+            title="Destino"
+            icon="http://maps.google.com/mapfiles/ms/icons/green-dot.png"
+          ></map-marker>
+        </google-map>
+      </div>
+      <ion-item>
+        <ion-label>Dirección de Inicio</ion-label>
+        <ion-input [(ngModel)]="startAddress" placeholder="Selecciona en el mapa"></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-label>Dirección de Destino</ion-label>
+        <ion-input [(ngModel)]="endAddress" placeholder="Selecciona en el mapa"></ion-input>
+      </ion-item>
+    </ion-card-content>
+  </ion-card>
+
+  <ion-button expand="block" color="primary" (click)="confirmService()">
+    Confirmar Servicio
+  </ion-button>
 </ion-content>
+
+<style>
+  .map-container {
+    height: 300px;
+    margin-bottom: 16px;
+  }
+
+  google-map {
+    width: 100%;
+    height: 100%;
+    border-radius: 8px;
+  }
+</style>
