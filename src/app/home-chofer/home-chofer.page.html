@@ -1,0 +1,48 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Bienvenido, Chofer</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="logout()">Cerrar sesión</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Detalles de tu próximo viaje</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <p>Servicio programado:</p>
+      <ion-item>
+        <ion-label>Desde:</ion-label>
+        <ion-text>{{ scheduledService?.from }}</ion-text>
+      </ion-item>
+      <ion-item>
+        <ion-label>Hasta:</ion-label>
+        <ion-text>{{ scheduledService?.to }}</ion-text>
+      </ion-item>
+      <ion-item>
+        <ion-label>Fecha:</ion-label>
+        <ion-text>{{ scheduledService?.date }}</ion-text>
+      </ion-item>
+      <ion-item>
+        <ion-label>Camión:</ion-label>
+        <ion-text>{{ scheduledService?.truckType }}</ion-text>
+      </ion-item>
+      <ion-button expand="full" (click)="startService()">Iniciar servicio</ion-button>
+    </ion-card-content>
+  </ion-card>
+
+  <ion-list>
+    <ion-item lines="none">
+      <ion-label color="tertiary">Mis viajes recientes</ion-label>
+    </ion-item>
+    <ion-item *ngFor="let trip of recentTrips" (click)="viewTripDetails(trip)">
+      <ion-label>
+        <h2>{{ trip.clientName }}</h2>
+        <p>{{ trip.date }}</p>
+      </ion-label>
+    </ion-item>
+  </ion-list>
+</ion-content>

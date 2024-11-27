@@ -1,28 +1,22 @@
 import { Injectable } from '@angular/core';
 import { SupabaseClient, createClient } from '@supabase/supabase-js';
+import { Router } from '@angular/router';
 
 @Injectable({
   providedIn: 'root',
 })
 export class LoginService {
-  private supabase: SupabaseClient;
+  private readonly supabase: SupabaseClient;
 
-  constructor() {
+  constructor(private readonly router: Router) {
     this.supabase = createClient(
       'https://tbttriwluxapxmukdgcj.supabase.co',
       'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRidHRyaXdsdXhhcHhtdWtkZ2NqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mjk1ODMzNTMsImV4cCI6MjA0NTE1OTM1M30.IELjZnoWXXcBz6OJTF5JLYyKFBW5Op3yb0YCoe6cYoU'
     );
   }
 
-  /**
-   * Autentica al usuario verificando las credenciales en las tablas `clientes` y `choferes`.
-   * @param email Correo electrónico del usuario
-   * @param password Contraseña del usuario
-   * @returns Datos del usuario si las credenciales son correctas; error en caso contrario.
-   */
   async login(email: string, password: string) {
     try {
-      // Verificar en la tabla de clientes
       const { data: cliente, error: clienteError } = await this.supabase
         .from('clientes')
         .select('id, nombre, rol, correo, clave')
@@ -32,10 +26,11 @@ export class LoginService {
 
       if (cliente) {
         console.log('Autenticado como cliente:', cliente);
-        return cliente; // Retorna el cliente autenticado
+        // Redirigir según el rol
+        this.router.navigate(['/home-cliente']);
+        return cliente;
       }
 
-      // Verificar en la tabla de choferes
       const { data: chofer, error: choferError } = await this.supabase
         .from('choferes')
         .select('id, nombre, rol, correo, clave')
@@ -45,10 +40,11 @@ export class LoginService {
 
       if (chofer) {
         console.log('Autenticado como chofer:', chofer);
-        return chofer; // Retorna el chofer autenticado
+        // Redirigir según el rol
+        this.router.navigate(['/home-chofer']);
+        return chofer;
       }
 
-      // Si no se encontró en ninguna tabla
       throw new Error('Credenciales incorrectas');
     } catch (error: any) {
       console.error('Error en login:', error.message);
@@ -56,9 +52,6 @@ export class LoginService {
     }
   }
 
-  /**
-   * Obtiene el usuario actualmente autenticado.
-   */
   async getUser() {
     const { data } = await this.supabase.auth.getUser();
     return data.user;

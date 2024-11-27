@@ -36,6 +36,16 @@ const routes: Routes = [
     redirectTo: 'login', // Redirige a login por defecto
     pathMatch: 'full',
   },
+  {
+    path: 'home-cliente',
+    loadChildren: () => import('./home-cliente/home-cliente.module').then(m => m.HomeClientePageModule),
+    canActivate: [AuthGuard],
+  },
+  {
+    path: 'home-chofer',
+    loadChildren: () => import('./home-chofer/home-chofer.module').then(m => m.HomeChoferPageModule),
+    canActivate: [AuthGuard],
+  },
 ];
 
 @NgModule({
