@@ -11,6 +11,7 @@ import { Session } from '@supabase/supabase-js';
 export class ProfilePage implements OnInit {
   user: any = {}; // Inicializamos como objeto vacío
   userId: string | null = null;
+  profileImage: string = ''; // Para almacenar la imagen de perfil seleccionada
 
   constructor(
     private readonly supabaseService: SupabaseService,
@@ -60,8 +61,33 @@ export class ProfilePage implements OnInit {
     }
   }
 
+  // Método para manejar la selección de la imagen
+  onFileSelected(event: any): void {
+    const file = event.target.files[0];
+    if (file) {
+      this.previewImage(file);
+      // Aquí puedes agregar la lógica para subir la imagen a Supabase o almacenarla en la base de datos
+    }
+  }
+
+  // Este método genera una URL de la imagen seleccionada para previsualizarla
+  previewImage(file: File): void {
+    const reader = new FileReader();
+    reader.onload = (e: any) => {
+      this.profileImage = e.target.result;
+      // También podrías guardar la imagen en el perfil del usuario aquí
+    };
+    reader.readAsDataURL(file);
+  }
+
+  // Función para cargar la imagen de perfil actual (si se ha cargado una nueva imagen, usarla)
+  getProfileImage(): string {
+    return this.profileImage || this.user.profileImage || 'assets/icon/default-profile.png';
+  }
+
   async uploadProfileImage() {
     console.log('Cambiar Imagen de Perfil: Funcionalidad pendiente.');
+    // Aquí puedes implementar la lógica para subir la nueva imagen a tu servidor o almacenamiento en la nube
   }
 
   async logout() {
@@ -71,11 +97,5 @@ export class ProfilePage implements OnInit {
     } catch (error: any) {
       console.error('Error al cerrar sesión:', error?.message || error);
     }
-  }
-
-  getProfileImage(): string {
-    return this.user.rol === 'chofer'
-      ? this.user.profileImage || 'assets/icon/camion.png'
-      : this.user.profileImage || 'assets/icon/cliente.png';
   }
 }

@@ -1,7 +1,7 @@
 <ion-header>
   <ion-toolbar>
     <ion-title>Mi Perfil</ion-title>
-    </ion-toolbar>
+  </ion-toolbar>
 </ion-header>
 
 <ion-content class="ion-padding">
@@ -18,7 +18,10 @@
       <p class="profile-info">
         <strong>Rol:</strong> {{ user?.role === 'chofer' ? 'Chofer' : 'Cliente' }} <!-- Mostrar rol (Chofer o Cliente) -->
       </p>
-      <ion-button expand="full" color="primary" (click)="uploadProfileImage()">Cambiar Imagen de Perfil</ion-button>
+      <ion-button expand="full" color="primary" (click)="fileInput.click()">Cambiar Imagen de Perfil</ion-button>
+
+      <!-- Input oculto para seleccionar la imagen -->
+      <input #fileInput type="file" accept="image/*" (change)="onFileSelected($event)" style="display: none;">
     </ion-card-content>
   </ion-card>
 </ion-content>
