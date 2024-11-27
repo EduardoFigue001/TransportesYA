@@ -4,6 +4,17 @@ ion-content {
     justify-content: center; // Centra horizontalmente
     align-items: center; // Centra verticalmente
     height: 100vh; // Ocupa toda la altura del dispositivo
+
+  .logo-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+  }
+  
+  ion-img {
+    max-width: 150px;
+    max-height: 150px;
+  }
   
     .login-container {
       transform: translateX(40px); // Mueve el contenedor 50px hacia la derecha  
@@ -52,5 +63,6 @@ ion-content {
     ion-button {
       font-size: 14px; // Ajusta el tamaño de los botones para pantallas pequeñas
     }
+    
   }
   

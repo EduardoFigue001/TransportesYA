@@ -5,6 +5,12 @@
 </ion-header>
 
 <ion-content class="ion-padding">
+  <!-- Contenedor del logo -->
+  <div class="logo-container">
+    <ion-img src="../../assets//icon/logoTransportesYA.png" alt="Logo de la aplicación"></ion-img>
+  </div>
+
+  <!-- Formulario de inicio de sesión -->
   <ion-item>
     <ion-label position="floating">Correo Electrónico</ion-label>
     <ion-input [(ngModel)]="email" type="email"></ion-input>
@@ -18,5 +24,3 @@
   <ion-button expand="full" (click)="login()">Iniciar Sesión</ion-button>
   <ion-button [routerLink]="['/register']" expand="block">Registrarse</ion-button>
 </ion-content>
-
-

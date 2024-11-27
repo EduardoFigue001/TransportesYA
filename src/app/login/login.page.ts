@@ -8,22 +8,32 @@ import { Router } from '@angular/router';
   styleUrls: ['./login.page.scss'],
 })
 export class LoginPage {
-  email: string = ''; // Define la propiedad email
-  password: string = ''; // Define la propiedad password
+  email: string = ''; // Propiedad para el email del usuario
+  password: string = ''; // Propiedad para la contraseña del usuario
 
   constructor(private readonly loginService: LoginService, private readonly router: Router) {}
 
   async login() {
     try {
+      console.log('Intentando iniciar sesión con:', this.email, this.password); // Debugging
       const user = await this.loginService.login(this.email, this.password);
-      console.log('Usuario logueado:', user);
 
-      // Redirigir al perfil del usuario después de un login exitoso
-      if (user?.id) {
-        this.router.navigate(['/profile', user.id]); // Redirigir con el ID del usuario
+      if (user) {
+        console.log('Usuario autenticado:', user);
+
+        // Redirecciona según el rol del usuario
+        if (user.rol === 'cliente') {
+          this.router.navigate(['/home-cliente']); // Página de cliente
+        } else if (user.rol === 'chofer') {
+          this.router.navigate(['/home-chofer']); // Página de chofer
+        } else {
+          console.error('Rol desconocido:', user.rol);
+          alert('Error: rol desconocido. Contacte al soporte.');
+        }
       }
     } catch (error: any) {
       console.error('Error al iniciar sesión:', error.message);
+      alert('Credenciales incorrectas. Por favor, verifica tu correo y contraseña.');
     }
   }
 }

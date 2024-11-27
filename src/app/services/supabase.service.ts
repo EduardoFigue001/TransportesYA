@@ -10,44 +10,47 @@ export class SupabaseService {
 
   constructor(private readonly router: Router) {
     this.supabase = createClient(
-      'https://tbttriwluxapxmukdgcj.supabase.co', // Mover a variables de entorno o archivo de configuración
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...' // Mover a variables de entorno
+      'https://tbttriwluxapxmukdgcj.supabase.co', // Reemplazar con variables de entorno
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...' // Reemplazar con variables de entorno
     );
   }
 
   // Método para iniciar sesión y verificar rol en 'choferes' o 'clientes'
   async signIn(email: string, password: string): Promise<boolean> {
     try {
-      // Intentar buscar al usuario en la tabla 'clientes'
-      const { data: cliente, error: clienteError } = await this.supabase
-        .from('clientes')
-        .select('*')
-        .eq('correo', email)
-        .eq('clave', password)
-        .single();
+      // Verificar en ambas tablas (clientes y choferes)
+      const tables = ['clientes', 'choferes'];
+      for (const table of tables) {
+        const { data, error } = await this.supabase
+          .from(table)
+          .select('id, nombre, rol')
+          .eq('correo', email)
+          .eq('clave', password)
+          .single();
 
-      if (cliente) {
-        console.log('Usuario autenticado como cliente:', cliente.nombre);
-        this.router.navigate(['./home-cliente']); // Redirigir a la vista de cliente
-        return true;
+        if (data) {
+          // Verificar que el rol sea válido
+          if (data.rol === 'cliente') {
+            console.log('Autenticado como cliente:', data.nombre);
+            this.router.navigate(['./home-cliente']); // Vista de cliente
+            return true;
+          } else if (data.rol === 'chofer') {
+            console.log('Autenticado como chofer:', data.nombre);
+            this.router.navigate(['./home-chofer']); // Vista de chofer
+            return true;
+          } else {
+            console.error(`El rol "${data.rol}" no tiene permiso para iniciar sesión.`);
+            return false;
+          }
+        }
+
+        if (error) {
+          console.log(`Usuario no encontrado en la tabla ${table}:`, error.message);
+        }
       }
 
-      // Intentar buscar al usuario en la tabla 'choferes'
-      const { data: chofer, error: choferError } = await this.supabase
-        .from('choferes')
-        .select('*')
-        .eq('correo', email)
-        .eq('clave', password)
-        .single();
-
-      if (chofer) {
-        console.log('Usuario autenticado como chofer:', chofer.nombre);
-        this.router.navigate(['./home-chofer']); // Redirigir a la vista de chofer
-        return true;
-      }
-
-      // Si no se encontró el usuario en ninguna tabla
-      console.error('Usuario no encontrado o credenciales incorrectas');
+      // Si no se encontró en ninguna tabla
+      console.error('Credenciales incorrectas o usuario no permitido.');
       return false;
     } catch (err) {
       console.error('Error inesperado al iniciar sesión:', err);
