@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { createClient, SupabaseClient, Session } from '@supabase/supabase-js';
-import { Router } from '@angular/router';
 
 @Injectable({
   providedIn: 'root',
@@ -8,114 +7,92 @@ import { Router } from '@angular/router';
 export class SupabaseService {
   private readonly supabase: SupabaseClient;
 
-  constructor(private readonly router: Router) {
+  constructor() {
     this.supabase = createClient(
-      'https://tbttriwluxapxmukdgcj.supabase.co', // Reemplazar con variables de entorno
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...' // Reemplazar con variables de entorno
+      'https://tbttriwluxapxmukdgcj.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InTidHRyaXdsdXhhcHhtdWtkZ2NqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mjk1ODMzNTMsImV4cCI6MjA0NTE1OTM1M30.IELjZnoWXXcBz6OJTF5JLYyKFBW5Op3yb0YCoe6cYoU'
     );
   }
 
-  // Método para iniciar sesión y verificar rol en 'choferes' o 'clientes'
-  async signIn(email: string, password: string): Promise<boolean> {
-    try {
-      // Verificar en ambas tablas (clientes y choferes)
-      const tables = ['clientes', 'choferes'];
-      for (const table of tables) {
-        const { data, error } = await this.supabase
-          .from(table)
-          .select('id, nombre, rol')
-          .eq('correo', email)
-          .eq('clave', password)
-          .single();
-
-        if (data) {
-          // Verificar que el rol sea válido
-          if (data.rol === 'cliente') {
-            console.log('Autenticado como cliente:', data.nombre);
-            this.router.navigate(['./home-cliente']); // Vista de cliente
-            return true;
-          } else if (data.rol === 'chofer') {
-            console.log('Autenticado como chofer:', data.nombre);
-            this.router.navigate(['./home-chofer']); // Vista de chofer
-            return true;
-          } else {
-            console.error(`El rol "${data.rol}" no tiene permiso para iniciar sesión.`);
-            return false;
-          }
-        }
-
-        if (error) {
-          console.log(`Usuario no encontrado en la tabla ${table}:`, error.message);
-        }
-      }
-
-      // Si no se encontró en ninguna tabla
-      console.error('Credenciales incorrectas o usuario no permitido.');
-      return false;
-    } catch (err) {
-      console.error('Error inesperado al iniciar sesión:', err);
-      return false;
-    }
+  async signOut() {
+    return await this.supabase.auth.signOut();
   }
 
-  // Obtener la sesión del usuario actual
-  async getSession(): Promise<Session | null> {
-    const { data, error } = await this.supabase.auth.getSession();
+  // Registra un usuario en auth y devuelve su UUID
+  async signUp(email: string, password: string): Promise<string | null> {
+    if (!email || !password) {
+      throw new Error('El correo y la contraseña son campos obligatorios.');
+    }
+
+    const { data, error } = await this.supabase.auth.signUp({ email, password });
     if (error) {
-      console.error('Error al obtener la sesión:', error.message);
-      return null;
+      console.error('Error al registrar usuario en auth:', error);
+      throw new Error('Error al registrar el usuario en el sistema de autenticación.');
     }
-    return data.session;
+
+    return data.user?.id || null; // Retorna el UUID del usuario creado
   }
 
-  // Obtener perfil del usuario
-  public async getUserProfile(
-    userId: string,
-    role: 'chofer' | 'cliente'
-  ): Promise<{ data: any | null; error: any | null }> {
-    const table = role === 'chofer' ? 'choferes' : 'clientes';
-    return this.querySupabase(table, 'id', userId);
+  // Verifica si el correo ya existe en las tablas 'clientes' o 'choferes'
+  async checkEmailExists(email: string): Promise<boolean> {
+    const { data: clienteData } = await this.supabase
+      .from('clientes')
+      .select('id')
+      .eq('correo', email)
+      .single();
+
+    const { data: choferData } = await this.supabase
+      .from('choferes')
+      .select('id')
+      .eq('correo', email)
+      .single();
+
+    return !!clienteData || !!choferData; // Devuelve true si el correo ya está registrado
   }
 
-  // Obtener viajes del usuario
-  public async getUserTrips(userId: string, role: 'chofer' | 'cliente'): Promise<{ data: any[] | null; error: any | null }> {
-    const column = role === 'chofer' ? 'chofer_id' : 'cliente_id';
-    return this.querySupabase('viajes', column, userId);
-  }
+  // Registra un usuario en la tabla correspondiente ('clientes' o 'choferes')
+  async registrarUsuario(datos: any): Promise<void> {
+    const { correo, clave, rol, ...extraData } = datos;
 
-  // Obtener servicios del usuario
-  public async getUserServices(userId: string, role: 'chofer' | 'cliente'): Promise<{ data: any[] | null; error: any | null }> {
-    const column = role === 'chofer' ? 'chofer_id' : 'cliente_id';
-    return this.querySupabase('services', column, userId);
-  }
+    // Verificar si el correo ya está registrado
+    const emailExists = await this.checkEmailExists(correo);
+    if (emailExists) {
+      throw new Error('El correo electrónico ya está registrado.');
+    }
 
-  // Método genérico para consultar Supabase
-  public async querySupabase(
-    table: string,
-    filterColumn: string,
-    filterValue: string
-  ): Promise<{ data: any[] | null; error: any | null }> {
+    // Crear usuario en auth y obtener UUID
+    const userUuid = await this.signUp(correo, clave);
+    if (!userUuid) {
+      throw new Error('No se pudo obtener el UUID del usuario registrado.');
+    }
+
     try {
-      const { data, error } = await this.supabase.from(table).select('*').eq(filterColumn, filterValue);
+      // Insertar datos adicionales según el rol
+      const tabla = rol === 'chofer' ? 'choferes' : 'clientes';
+      const dataToInsert = { user_uuid: userUuid, correo, ...extraData };
 
+      const { error } = await this.supabase.from(tabla).insert(dataToInsert);
       if (error) {
-        console.error(`Error al consultar la tabla ${table}:`, error.message);
-        return { data: null, error };
+        throw error; // Lanza un error para ser capturado en el catch
       }
-      return { data, error: null };
-    } catch (err) {
-      console.error('Error inesperado al consultar Supabase:', err);
-      return { data: null, error: err };
+
+      console.log(`Usuario registrado con éxito en ${tabla}`);
+    } catch (error) {
+      console.error(`Error al insertar datos en la tabla correspondiente:`, error);
+
+      // Intentar eliminar el usuario de auth.users en caso de error
+      const { error: deleteUserError } = await this.supabase.auth.admin.deleteUser(userUuid);
+      if (deleteUserError) {
+        console.error(`Error al eliminar usuario de auth.users:`, deleteUserError);
+      }
+
+      throw new Error('Error al registrar el usuario en la tabla personalizada.');
     }
   }
 
-  // Método para cerrar sesión
-  public async signOut(): Promise<void> {
-    try {
-      await this.supabase.auth.signOut();
-      console.log('Sesión cerrada correctamente');
-    } catch (err) {
-      console.error('Error al cerrar sesión:', err);
-    }
+  // Método para obtener la sesión actual del usuario
+  async getSession(): Promise<Session | null> {
+    const { data } = await this.supabase.auth.getSession();
+    return data.session;
   }
 }

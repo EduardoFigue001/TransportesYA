@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { AuthGuard } from './auth.guard';
 import { SupabaseService } from './services/supabase.service';
-import { Session } from '@supabase/supabase-js'; // Asegúrate de que esta importación esté presente
+import { Session } from '@supabase/supabase-js';  // Asegúrate de importar Session
 import { of } from 'rxjs';
 
 describe('AuthGuard', () => {
@@ -32,7 +32,7 @@ describe('AuthGuard', () => {
   });
 
   it('should allow activation when session exists', async () => {
-    // Simulando una sesión activa con todas las propiedades necesarias
+    // Simular una sesión activa como un objeto de tipo 'Session'
     const mockSession: Session = {
       access_token: 'mockAccessToken',
       refresh_token: 'mockRefreshToken',
@@ -54,19 +54,20 @@ describe('AuthGuard', () => {
       },
     };
 
+    // Usamos Promise.resolve() en vez de of() para devolver una Promesa con la sesión simulada
     supabaseServiceSpy.getSession.and.returnValue(Promise.resolve(mockSession));
 
     const result = await authGuard.canActivate();
-    expect(result).toBe(true);  // Debe permitir el acceso
-    expect(routerSpy.navigate).not.toHaveBeenCalled();  // No debe redirigir
+    expect(result).toBe(true);  // Permitir activación
+    expect(routerSpy.navigate).not.toHaveBeenCalled();  // No redirigir
   });
 
   it('should redirect to login when session does not exist', async () => {
-    // Simulando la ausencia de sesión
-    supabaseServiceSpy.getSession.and.returnValue(Promise.resolve(null));
+    // Simular ausencia de sesión con una Promesa que devuelve null
+    supabaseServiceSpy.getSession.and.returnValue(Promise.resolve(null));  // Simular sesión no existente
 
     const result = await authGuard.canActivate();
-    expect(result).toBe(false);  // No debe permitir el acceso
-    expect(routerSpy.navigate).toHaveBeenCalledWith(['/login']);  // Debe redirigir al login
+    expect(result).toBe(false);  // No permitir activación
+    expect(routerSpy.navigate).toHaveBeenCalledWith(['/login']);  // Redirigir a login
   });
 });

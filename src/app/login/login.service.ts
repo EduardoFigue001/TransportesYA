@@ -17,16 +17,19 @@ export class LoginService {
 
   async login(email: string, password: string) {
     try {
+      // Validación simple de que el correo y la contraseña no estén vacíos
+      if (!email || !password) {
+        throw new Error('Por favor ingrese un correo y una contraseña.');
+      }
+
       const { data: cliente, error: clienteError } = await this.supabase
         .from('clientes')
         .select('id, nombre, rol, correo, clave')
         .eq('correo', email)
-        .eq('clave', password) // Si las contraseñas no están cifradas
         .single();
 
-      if (cliente) {
+      if (cliente && cliente.clave === password) { // Comparación de contraseñas
         console.log('Autenticado como cliente:', cliente);
-        // Redirigir según el rol
         this.router.navigate(['/home-cliente']);
         return cliente;
       }
@@ -35,12 +38,10 @@ export class LoginService {
         .from('choferes')
         .select('id, nombre, rol, correo, clave')
         .eq('correo', email)
-        .eq('clave', password) // Si las contraseñas no están cifradas
         .single();
 
-      if (chofer) {
+      if (chofer && chofer.clave === password) { // Comparación de contraseñas
         console.log('Autenticado como chofer:', chofer);
-        // Redirigir según el rol
         this.router.navigate(['/home-chofer']);
         return chofer;
       }

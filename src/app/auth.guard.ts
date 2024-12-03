@@ -12,16 +12,14 @@ export class AuthGuard implements CanActivate {
     const user = await this.loginService.getUser();
 
     if (user) {
-      // Verificar si el usuario es cliente o chofer
-      if (user.role === 'cliente') {
-        this.router.navigate(['/home-cliente']);
-      } else if (user.role === 'chofer') {
-        this.router.navigate(['/home-chofer']);
+      // Verificar si el usuario tiene rol válido
+      if (user.role === 'cliente' || user.role === 'chofer') {
+        return true; // Permitir el acceso a la ruta
       }
-      return true;
-    } else {
-      this.router.navigate(['/login']); // Si no, redirigir a la página de login
-      return false;
     }
+
+    // Si no hay usuario o el rol no es válido, redirigir al login
+    this.router.navigate(['/login']);
+    return false;
   }
 }

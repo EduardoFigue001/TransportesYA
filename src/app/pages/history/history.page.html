@@ -1,27 +1,28 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>Historial de Viajes</ion-title>
+    <ion-title>Historial</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content>
-  <ion-list *ngIf="historialViajes.length > 0; else noViajes">
-    <ion-item *ngFor="let viaje of historialViajes">
+  <ion-spinner *ngIf="loadingTrips || loadingServices"></ion-spinner>
+  
+  <ion-list *ngIf="!loadingTrips && trips.length > 0">
+    <ion-item *ngFor="let viaje of trips">
       <ion-card>
         <ion-card-header>
           <ion-card-title>Camión: {{ viaje.camiones.tipo }}</ion-card-title>
         </ion-card-header>
         <ion-card-content>
-          <p><strong>Inicio:</strong> {{ viaje.ubicacion_inicio }}</p>
-          <p><strong>Destino:</strong> {{ viaje.ubicacion_fin }}</p>
+          <p><strong>Origen:</strong> {{ viaje.origen }}</p>
+          <p><strong>Destino:</strong> {{ viaje.destino }}</p>
+          <p><strong>Fecha:</strong> {{ viaje.fecha }}</p>
+          <p><strong>Estado:</strong> {{ viaje.estado }}</p>
           <p><strong>Capacidad:</strong> {{ viaje.camiones.capacidad }} kg</p>
-          <p><strong>Fecha:</strong> {{ viaje.fecha | date }}</p>
         </ion-card-content>
       </ion-card>
     </ion-item>
   </ion-list>
 
-  <ng-template #noViajes>
-    <ion-text>No tienes viajes registrados.</ion-text>
-  </ng-template>
+  <p *ngIf="!loadingTrips && trips.length === 0">No hay viajes registrados.</p>
 </ion-content>
