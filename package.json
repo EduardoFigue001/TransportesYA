@@ -33,6 +33,7 @@
     "@capacitor/status-bar": "6.0.1",
     "@ionic/angular": "^8.4.0",
     "@supabase/supabase-js": "^2.46.2",
+    "dotenv": "^16.4.6",
     "ionicons": "^7.0.0",
     "leaflet": "^1.9.4",
     "rxjs": "~7.8.0",

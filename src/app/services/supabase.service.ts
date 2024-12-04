@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { createClient, SupabaseClient, Session } from '@supabase/supabase-js';
+import { environment } from '../../environments/environment'; // Importa tu archivo de configuración
 
 @Injectable({
   providedIn: 'root',
@@ -8,17 +9,27 @@ export class SupabaseService {
   private readonly supabase: SupabaseClient;
 
   constructor() {
-    this.supabase = createClient(
-      'https://tbttriwluxapxmukdgcj.supabase.co',
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InTidHRyaXdsdXhhcHhtdWtkZ2NqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mjk1ODMzNTMsImV4cCI6MjA0NTE1OTM1M30.IELjZnoWXXcBz6OJTF5JLYyKFBW5Op3yb0YCoe6cYoU'
-    );
+    // Usa las variables definidas en environment.ts
+    const supabaseUrl = environment.supabaseUrl;
+    const supabaseKey = environment.supabaseKey;
+
+    if (!supabaseUrl || !supabaseKey) {
+      throw new Error(
+        'Supabase URL o clave no están definidas. Asegúrate de que las configuraciones en environment.ts sean correctas.'
+      );
+    }
+
+    this.supabase = createClient(supabaseUrl, supabaseKey);
   }
 
-  async signOut() {
-    return await this.supabase.auth.signOut();
+  async signOut(): Promise<void> {
+    const { error } = await this.supabase.auth.signOut();
+    if (error) {
+      console.error('Error al cerrar sesión:', error);
+      throw new Error('Error al cerrar sesión.');
+    }
   }
 
-  // Registra un usuario en auth y devuelve su UUID
   async signUp(email: string, password: string): Promise<string | null> {
     if (!email || !password) {
       throw new Error('El correo y la contraseña son campos obligatorios.');
@@ -30,10 +41,9 @@ export class SupabaseService {
       throw new Error('Error al registrar el usuario en el sistema de autenticación.');
     }
 
-    return data.user?.id || null; // Retorna el UUID del usuario creado
+    return data.user?.id || null;
   }
 
-  // Verifica si el correo ya existe en las tablas 'clientes' o 'choferes'
   async checkEmailExists(email: string): Promise<boolean> {
     const { data: clienteData } = await this.supabase
       .from('clientes')
@@ -47,52 +57,62 @@ export class SupabaseService {
       .eq('correo', email)
       .single();
 
-    return !!clienteData || !!choferData; // Devuelve true si el correo ya está registrado
+    return !!clienteData || !!choferData;
   }
 
-  // Registra un usuario en la tabla correspondiente ('clientes' o 'choferes')
   async registrarUsuario(datos: any): Promise<void> {
-    const { correo, clave, rol, ...extraData } = datos;
+    const { correo, clave, rol, ...restoDatos } = datos;
 
-    // Verificar si el correo ya está registrado
     const emailExists = await this.checkEmailExists(correo);
     if (emailExists) {
       throw new Error('El correo electrónico ya está registrado.');
     }
 
-    // Crear usuario en auth y obtener UUID
+    if (!clave) {
+      throw new Error('La contraseña (clave) es obligatoria.');
+    }
+
     const userUuid = await this.signUp(correo, clave);
     if (!userUuid) {
       throw new Error('No se pudo obtener el UUID del usuario registrado.');
     }
 
     try {
-      // Insertar datos adicionales según el rol
       const tabla = rol === 'chofer' ? 'choferes' : 'clientes';
-      const dataToInsert = { user_uuid: userUuid, correo, ...extraData };
+      const dataToInsert = {
+        user_uuid: userUuid,
+        correo,
+        ...restoDatos,
+      };
 
       const { error } = await this.supabase.from(tabla).insert(dataToInsert);
       if (error) {
-        throw error; // Lanza un error para ser capturado en el catch
+        throw error;
       }
 
       console.log(`Usuario registrado con éxito en ${tabla}`);
     } catch (error) {
-      console.error(`Error al insertar datos en la tabla correspondiente:`, error);
+      console.error('Error al insertar datos en la tabla:', error);
 
-      // Intentar eliminar el usuario de auth.users en caso de error
-      const { error: deleteUserError } = await this.supabase.auth.admin.deleteUser(userUuid);
-      if (deleteUserError) {
-        console.error(`Error al eliminar usuario de auth.users:`, deleteUserError);
+      try {
+        const { error: deleteUserError } = await this.supabase.auth.admin.deleteUser(userUuid);
+        if (deleteUserError) {
+          console.error('Error al eliminar usuario de auth.users:', deleteUserError);
+        }
+      } catch (deleteError) {
+        console.error('Error al intentar eliminar al usuario de auth.users:', deleteError);
       }
 
       throw new Error('Error al registrar el usuario en la tabla personalizada.');
     }
   }
 
-  // Método para obtener la sesión actual del usuario
   async getSession(): Promise<Session | null> {
-    const { data } = await this.supabase.auth.getSession();
+    const { data, error } = await this.supabase.auth.getSession();
+    if (error) {
+      console.error('Error al obtener la sesión actual:', error);
+      throw new Error('No se pudo obtener la sesión actual.');
+    }
     return data.session;
   }
 }
