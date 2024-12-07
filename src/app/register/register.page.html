@@ -5,7 +5,7 @@
 </ion-header>
 
 <ion-content>
-  <form (submit)="registrarUsuario($event)">
+  <form (submit)="registrarUsuario()">
     <!-- Información básica -->
     <ion-item>
       <ion-label position="floating">Nombre</ion-label>
@@ -19,8 +19,13 @@
 
     <ion-item>
       <ion-label position="floating">Contraseña</ion-label>
-      <ion-input [(ngModel)]="clave" name="clave" type="password" required></ion-input>
+      <ion-input [(ngModel)]="clave" name="clave" type="password" required minlength="6"></ion-input>
+      <ion-note slot="error" color="danger" *ngIf="clave && clave.length < 6">
+        La contraseña debe tener al menos 6 caracteres.
+      </ion-note>
     </ion-item>
+    
+    
 
     <!-- Selección de rol -->
     <ion-item>
@@ -66,29 +71,30 @@
       </ion-select>
     </ion-item>
 
-    <!-- Selección de tipo de camión (solo chofer) -->
-    <ion-item *ngIf="rolSeleccionado === 'chofer'">
-      <ion-label>Tipo de Camión</ion-label>
-      <ion-select [(ngModel)]="tipoCamion" name="tipoCamion" required>
-        <ion-select-option *ngFor="let tipo of tipoCamiones" [value]="tipo">{{ tipo }}</ion-select-option>
-      </ion-select>
-    </ion-item>
+    <!-- Campos específicos del chofer -->
+    <ng-container *ngIf="rolSeleccionado === 'chofer'">
+      <ion-item>
+        <ion-label>Tipo de Camión</ion-label>
+        <ion-select [(ngModel)]="tipoCamion" name="tipoCamion" required>
+          <ion-select-option *ngFor="let tipo of tipoCamiones" [value]="tipo">{{ tipo }}</ion-select-option>
+        </ion-select>
+      </ion-item>
 
-    <!-- Datos del chofer -->
-    <ion-item *ngIf="rolSeleccionado === 'chofer'">
-      <ion-label position="floating">Patente</ion-label>
-      <ion-input [(ngModel)]="patente" name="patente" required></ion-input>
-    </ion-item>
+      <ion-item>
+        <ion-label position="floating">Patente</ion-label>
+        <ion-input [(ngModel)]="patente" name="patente" required></ion-input>
+      </ion-item>
 
-    <ion-item *ngIf="rolSeleccionado === 'chofer'">
-      <ion-label position="floating">Modelo</ion-label>
-      <ion-input [(ngModel)]="modelo" name="modelo" required></ion-input>
-    </ion-item>
+      <ion-item>
+        <ion-label position="floating">Modelo</ion-label>
+        <ion-input [(ngModel)]="modelo" name="modelo" required></ion-input>
+      </ion-item>
 
-    <ion-item *ngIf="rolSeleccionado === 'chofer'">
-      <ion-label position="floating">Año</ion-label>
-      <ion-input [(ngModel)]="anio" name="anio" type="number" required></ion-input>
-    </ion-item>
+      <ion-item>
+        <ion-label position="floating">Año</ion-label>
+        <ion-input [(ngModel)]="anio" name="anio" type="number" required></ion-input>
+      </ion-item>
+    </ng-container>
 
     <!-- Botón de registro -->
     <ion-button expand="full" type="submit">Registrar</ion-button>

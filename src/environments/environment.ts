@@ -1,6 +1,6 @@
 export const environment = {
-  production: false, // Modo desarrollo
-  supabaseUrl: 'https://tbttriwluxapxmukdgcj.supabase.co',
-  supabaseKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRidHRyaXdsdXhhcHhtdWtkZ2NqIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTcyOTU4MzM1MywiZXhwIjoyMDQ1MTU5MzUzfQ.xQXprBf-sOTWo8WwgpY4h-zgtfplKDUkSFInrr2GI1A',
+  production: false, 
+  supabaseUrl: 'https://mtepkardznyqtlmcokhk.supabase.co',
+  supabaseKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10ZXBrYXJkem55cXRsbWNva2hrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzM1NDkyMzcsImV4cCI6MjA0OTEyNTIzN30.x8o7x988iQkJv4NgnibD0Tbqu_DI4aDepu5FDZ8ZqdM',
   googleMapsApiKey: 'AIzaSyALuVO2lxFSaVQeECWc-SQtZT9q6qcNUg4',
 };
