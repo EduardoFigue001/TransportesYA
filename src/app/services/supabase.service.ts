@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { createClient, SupabaseClient, Session } from '@supabase/supabase-js';
 import { environment } from '../../environments/environment';
+import CryptoJS from 'crypto-js';
 
 @Injectable({
   providedIn: 'root',
@@ -77,11 +78,15 @@ export class SupabaseService {
       throw new Error('El correo ya está registrado.');
     }
 
+    // Hashear la contraseña antes de registrarla
+    const hashedPassword = CryptoJS.SHA256(usuarioData.clave).toString();
+
     // Registrar en `usuarios`
     const { data: usuario, error: userError } = await this.supabase
       .from('usuarios')
       .insert({
         ...usuarioData,
+        clave: hashedPassword, // Almacena la contraseña hasheada
         rol,
       })
       .select('*')

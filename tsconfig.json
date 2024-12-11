@@ -16,18 +16,24 @@
     "experimentalDecorators": true,
     "moduleResolution": "node",
     "importHelpers": true,
-    "target": "es2022",
-    "module": "es2020",
+    "target": "ES2022",
+    "module": "ES2020",
     "lib": [
-      "es2018", 
-      "dom"
+      "ES2022",
+      "DOM"
     ],
-    "useDefineForClassFields": false
+    "skipLibCheck": true,
+    "useDefineForClassFields": false,
+
+    // Agregados para compatibilidad con CryptoJS y otras bibliotecas
+    "allowSyntheticDefaultImports": true, // Permite importar módulos con `export =` como si fueran ES6
+    "esModuleInterop": true // Habilita la interoperabilidad entre CommonJS y ES Modules
   },
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,
     "strictInjectionParameters": true,
     "strictInputAccessModifiers": true,
-    "strictTemplates": true
+    "strictTemplates": true,
+    "disableTypeScriptVersionCheck": true
   }
 }
