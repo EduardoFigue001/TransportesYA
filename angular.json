@@ -36,7 +36,11 @@
             ],
             "styles": ["src/global.scss", "src/theme/variables.scss"],
             "scripts": [],
-            "allowedCommonJsDependencies": ["ws", "bcryptjs", "crypto-js"]
+            "allowedCommonJsDependencies": [
+              "ws",
+              "bcryptjs",
+              "crypto-js"  
+            ]
           },
           "configurations": {
             "production": {
