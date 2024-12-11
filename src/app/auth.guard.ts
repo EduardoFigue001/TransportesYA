@@ -1,14 +1,14 @@
 import { Injectable } from '@angular/core';
-import { CanActivate, Router } from '@angular/router';
-import { SupabaseService } from '../app/services/supabase.service';
+import { CanActivate, ActivatedRouteSnapshot, Router } from '@angular/router';
+import { SupabaseService } from './services/supabase.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthGuard implements CanActivate {
-  constructor(private readonly supabaseService: SupabaseService, private readonly router: Router) {}
+  constructor(private supabaseService: SupabaseService, private router: Router) {}
 
-  async canActivate(): Promise<boolean> {
+  async canActivate(route: ActivatedRouteSnapshot): Promise<boolean> {
     try {
       const session = await this.supabaseService.getSession();
 
@@ -19,22 +19,26 @@ export class AuthGuard implements CanActivate {
           .eq('id', session.user.id)
           .single();
 
-        if (error) {
-          console.error('Error al obtener el rol del usuario:', error.message);
+        if (error || !userData) {
+          console.error('Error al obtener el rol del usuario:', error);
           this.router.navigate(['/login']);
           return false;
         }
 
-        if (userData && ['cliente', 'chofer'].includes(userData.rol)) {
-          return true; // Permitir acceso
+        const requiredRole = route.data?.['role'];
+        if (requiredRole && userData.rol !== requiredRole) {
+          console.warn('Acceso denegado: Rol no autorizado.');
+          this.router.navigate(['/login']);
+          return false;
         }
+
+        return true;
       }
 
       this.router.navigate(['/login']);
       return false;
-    } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
-      console.error('Error en AuthGuard:', errorMessage);
+    } catch (error) {
+      console.error('Error en AuthGuard:', error);
       this.router.navigate(['/login']);
       return false;
     }

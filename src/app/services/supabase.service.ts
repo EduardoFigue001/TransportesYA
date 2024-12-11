@@ -21,7 +21,7 @@ export class SupabaseService {
     this.supabase = createClient(supabaseUrl, supabaseKey, {
       auth: {
         persistSession: true, // Mantener la sesión persistente
-        lock: undefined, // No configurar bloqueo explícito para evitar problemas con Navigator LockManager
+        lock: undefined,      // Evita problemas con Navigator LockManager
       },
     });
   }
@@ -40,23 +40,18 @@ export class SupabaseService {
    * Verifica si un correo ya está registrado
    */
   async checkEmailExists(email: string): Promise<boolean> {
-    try {
-      const { data, error } = await this.supabase
-        .from('usuarios')
-        .select('id')
-        .eq('correo', email)
-        .maybeSingle();
+    const { data, error } = await this.supabase
+      .from('usuarios')
+      .select('id')
+      .eq('correo', email)
+      .maybeSingle();
 
-      if (error) {
-        console.error('Error al verificar correo:', error.message);
-        return false;
-      }
-
-      return !!data;
-    } catch (error) {
-      console.error('Error desconocido al verificar correo:', error);
+    if (error) {
+      console.error('Error al verificar correo:', error.message);
       return false;
     }
+
+    return !!data;
   }
 
   /**
@@ -75,7 +70,7 @@ export class SupabaseService {
     patente?: string;
     modelo?: string;
     anio?: number;
-  }): Promise<void> {
+  }): Promise<{ data?: any; error?: any }> {
     const { rol, tipo_camion, patente, modelo, anio, ...usuarioData } = datos;
 
     if (await this.checkEmailExists(usuarioData.correo)) {
@@ -120,6 +115,8 @@ export class SupabaseService {
     } else {
       throw new Error('Rol desconocido. Solo se permite cliente o chofer.');
     }
+
+    return { data: usuario };
   }
 
   /**
@@ -129,13 +126,47 @@ export class SupabaseService {
     try {
       const { data, error } = await this.supabase.auth.getSession();
       if (error) {
-        throw new Error('No se pudo obtener la sesión actual: ' + error.message);
+        console.error('Error al obtener la sesión:', error);
+        return null;
       }
-
       return data.session;
     } catch (error) {
-      console.error('Error al obtener la sesión:', error);
-      throw error;
+      console.error('Error desconocido al obtener la sesión:', error);
+      return null;
     }
+  }
+
+  /**
+   * Obtiene un usuario por correo
+   */
+  async obtenerUsuarioPorCorreo(correo: string): Promise<{ data?: any; error?: any }> {
+    const { data, error } = await this.supabase
+      .from('usuarios')
+      .select('*')
+      .eq('correo', correo)
+      .maybeSingle();
+    return { data, error };
+  }
+
+  /**
+   * Obtiene información del rol (cliente o chofer) según el user_id
+   */
+  async obtenerDatosRol(tabla: string, userId: string): Promise<{ data?: any; error?: any }> {
+    const { data, error } = await this.supabase
+      .from(tabla)
+      .select('*')
+      .eq('user_id', userId)
+      .maybeSingle();
+    return { data, error };
+  }
+
+  /**
+   * Sube una foto de perfil al almacenamiento de Supabase
+   */
+  async subirFotoPerfil(fileName: string, blob: Blob): Promise<{ data?: any; error?: any }> {
+    const { data, error } = await this.supabase.storage
+      .from('profile-photos')
+      .upload(fileName, blob, { contentType: 'image/png' });
+    return { data, error };
   }
 }

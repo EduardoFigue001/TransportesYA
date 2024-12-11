@@ -13,7 +13,7 @@ export class RegisterPage {
   nombre: string = '';
   correo: string = '';
   clave: string = '';
-  rolSeleccionado: 'cliente' | 'chofer' = 'cliente'; // Tipo restringido a los valores permitidos
+  rolSeleccionado: 'cliente' | 'chofer' = 'cliente';
   direccion: string = '';
   paisSeleccionado: string = '';
   regionSeleccionada: string = '';
@@ -21,7 +21,7 @@ export class RegisterPage {
   tipoCamion: string = '';
   patente: string = '';
   modelo: string = '';
-  anio: number | null = null;
+  anio: number | undefined = undefined;
 
   paises = [
     { nombre: 'Argentina', bandera: 'https://flagcdn.com/w320/ar.png', regiones: ['Buenos Aires', 'Córdoba', 'Santa Fe'] },
@@ -65,26 +65,48 @@ export class RegisterPage {
 
   async registrarUsuario() {
     try {
-      const hashedPassword = await bcrypt.hash(this.clave, 10); // Hasheamos la contraseña
+      if (!this.nombre || !this.correo || !this.clave || !this.rolSeleccionado) {
+        await this.mostrarAlerta('Error', 'Todos los campos obligatorios deben ser completados.');
+        return;
+      }
 
-      // Ajustar las propiedades al formato esperado por el servicio
-      const datos = {
+      const hashedPassword = await bcrypt.hash(this.clave, 10);
+
+      // Aseguramos que los datos sean estrictamente del tipo esperado
+      const datos: {
+        nombre: string;
+        correo: string;
+        clave: string;
+        direccion: string;
+        pais: string;
+        region: string;
+        ciudad: string;
+        rol: 'cliente' | 'chofer';
+        tipo_camion?: string;
+        patente?: string;
+        modelo?: string;
+        anio?: number;
+      } = {
         nombre: this.nombre,
         correo: this.correo,
-        clave: hashedPassword, // Contraseña hasheada
-        rol: this.rolSeleccionado, // Ahora es 'cliente' o 'chofer'
-        direccion: this.direccion,
-        pais: this.paisSeleccionado,
-        region: this.regionSeleccionada,
-        ciudad: this.ciudadSeleccionada,
-        tipo_camion: this.tipoCamion || undefined, // Ajuste al nombre esperado
-        patente: this.patente || undefined, // Ajuste al nombre esperado
-        modelo: this.modelo || undefined, // Ajuste al nombre esperado
-        anio: this.anio || undefined, // Manejo de valores nulos
+        clave: hashedPassword,
+        rol: this.rolSeleccionado,
+        direccion: this.direccion || '', // Garantizamos que sea string
+        pais: this.paisSeleccionado || '', // Garantizamos que sea string
+        region: this.regionSeleccionada || '', // Garantizamos que sea string
+        ciudad: this.ciudadSeleccionada || '', // Garantizamos que sea string
+        tipo_camion: this.rolSeleccionado === 'chofer' ? this.tipoCamion : undefined,
+        patente: this.rolSeleccionado === 'chofer' ? this.patente : undefined,
+        modelo: this.rolSeleccionado === 'chofer' ? this.modelo : undefined,
+        anio: this.rolSeleccionado === 'chofer' ? this.anio : undefined,
       };
 
-      // Registrar usuario
-      await this.supabaseService.registrarUsuario(datos);
+      const { error } = await this.supabaseService.registrarUsuario(datos);
+
+      if (error) {
+        throw new Error(error.message);
+      }
+
       await this.mostrarAlerta('Éxito', 'Usuario registrado correctamente.');
       this.router.navigate(['/login']);
     } catch (error: any) {
