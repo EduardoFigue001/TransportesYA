@@ -1,16 +1,34 @@
 <ion-header>
-  <ion-toolbar>
+  <ion-toolbar color="primary">
     <ion-title>Perfil</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
-  <div class="profile-info">
-    <img [src]="profilePhoto || 'assets/icon/default-profile.png'" alt="Imagen de Perfil">
-    <h2>{{ user.name }}</h2>
-    <p>{{ user.email }}</p>
-    <p>{{ user.role }}</p>
-  </div>
-  
-  <ion-button (click)="takePicture()">Cambiar Imagen</ion-button>
+<ion-content class="profile-page">
+
+  <ion-card class="profile-card">
+    <ion-card-content>
+      <div class="profile-info">
+        <ion-avatar class="profile-avatar">
+          <!-- Muestra la foto de perfil si existe, sino un ícono por defecto -->
+          <img [src]="profilePhoto || 'assets/icon/default-profile.png'" alt="Imagen de Perfil">
+        </ion-avatar>
+        <h2>{{ user?.name }}</h2>
+        <p>{{ user?.role }}</p>
+      </div>
+      
+      <ion-button 
+        expand="full" 
+        fill="solid" 
+        color="secondary" 
+        (click)="takePicture()"
+        class="change-picture-btn"
+      >
+        <ion-icon slot="start" name="camera"></ion-icon>
+        Cambiar Imagen
+      </ion-button>
+
+    </ion-card-content>
+  </ion-card>
+
 </ion-content>

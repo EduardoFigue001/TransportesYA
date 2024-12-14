@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
-import { AuthGuard } from './auth.guard';
+// Eliminar esta línea de importación:
+// import { AuthGuard } from './auth.guard';
 
 const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
@@ -15,28 +16,28 @@ const routes: Routes = [
   {
     path: 'home',
     loadChildren: () => import('./home/home.module').then(m => m.HomePageModule),
-    canActivate: [AuthGuard],
+    // canActivate: [AuthGuard],  // Eliminar esta línea
   },
   {
     path: 'profile',
     loadChildren: () => import('./pages/profile/profile.module').then(m => m.ProfilePageModule),
-    canActivate: [AuthGuard],
+    // canActivate: [AuthGuard],
   },
   {
     path: 'services',
     loadChildren: () => import('./services/services.module').then(m => m.ServicesPageModule),
-    canActivate: [AuthGuard],
+    // canActivate: [AuthGuard],
   },
   {
     path: 'home-cliente',
     loadChildren: () => import('./home-cliente/home-cliente.module').then(m => m.HomeClientePageModule),
-    canActivate: [AuthGuard],
+    // canActivate: [AuthGuard],
     data: { role: 'cliente' },
   },
   {
     path: 'home-chofer',
     loadChildren: () => import('./home-chofer/home-chofer.module').then(m => m.HomeChoferPageModule),
-    canActivate: [AuthGuard],
+    // canActivate: [AuthGuard],
     data: { role: 'chofer' },
   },
   {

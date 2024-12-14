@@ -1,7 +1,6 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { SupabaseService } from '../services/supabase.service';
-import * as bcrypt from 'bcryptjs';
 
 @Component({
   selector: 'app-login',
@@ -23,6 +22,7 @@ export class LoginPage {
         throw new Error('Por favor, ingresa un correo y una contraseña.');
       }
 
+      // Consultamos la tabla 'usuarios'
       const { data: usuario, error } = await this.supabaseService.supabase
         .from('usuarios')
         .select('id, nombre, rol, correo, clave')
@@ -34,12 +34,22 @@ export class LoginPage {
         throw new Error('Credenciales incorrectas.');
       }
 
-      const passwordMatch = await bcrypt.compare(this.password, usuario.clave);
-
-      if (!passwordMatch) {
+      /**
+       * SIN bcrypt: asumiendo que el back-end o la configuración 
+       * de Supabase debe validar las credenciales.
+       * 
+       * Si tu tabla 'usuarios' guarda la contraseña hasheada en 'clave',
+       * no puedes verificarla correctamente desde el front sin bcrypt.
+       * Lo ideal: hacer un request a tu back-end/Supabase Auth 
+       * que valide el usuario y la contraseña.
+       * 
+       * EJEMPLO BÁSICO: solo verifica que password = usuario.clave (inseguro).
+       * */
+      if (this.password !== usuario.clave) {
         throw new Error('Credenciales incorrectas.');
       }
 
+      // Redirección en base al rol
       if (usuario.rol === 'cliente') {
         await this.redirectToRole('clientes', usuario.id, '/home-cliente');
       } else if (usuario.rol === 'chofer') {
@@ -47,6 +57,7 @@ export class LoginPage {
       } else {
         throw new Error('Rol desconocido. Contacte al soporte.');
       }
+
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
       console.error('Error al iniciar sesión:', errorMessage);

@@ -9,7 +9,8 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "lint": "ng lint"
+    "lint": "ng lint",
+    "build-custom": "ng build --configuration production"
   },
   "private": true,
   "dependencies": {
@@ -23,9 +24,9 @@
     "@angular/platform-browser": "^19.0.3",
     "@angular/platform-browser-dynamic": "^19.0.3",
     "@angular/router": "^19.0.3",
-    "@capacitor/android": "6.1.2",
+    "@capacitor/android": "6.2.0",
     "@capacitor/app": "6.0.1",
-    "@capacitor/camera": "^6.1.1",
+    "@capacitor/camera": "^6.1.2",
     "@capacitor/core": "^6.1.2",
     "@capacitor/geolocation": "^6.0.2",
     "@capacitor/haptics": "6.0.1",
@@ -35,7 +36,6 @@
     "@supabase/supabase-js": "^2.47.3",
     "argon2-browser": "^1.18.0",
     "assert": "^2.1.0",
-    "bcryptjs": "^2.4.3",
     "buffer": "^6.0.3",
     "crypto-browserify": "^3.12.1",
     "crypto-js": "^4.2.0",

@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { SupabaseService } from '../services/supabase.service';
 import { AlertController } from '@ionic/angular';
-import * as bcrypt from 'bcryptjs';
+// Quitar la línea de import * as bcrypt from 'bcryptjs';
 
 @Component({
   selector: 'app-register',
@@ -70,9 +70,10 @@ export class RegisterPage {
         return;
       }
 
-      const hashedPassword = await bcrypt.hash(this.clave, 10);
-
-      // Aseguramos que los datos sean estrictamente del tipo esperado
+      /**
+       * Ya NO usamos bcrypt. La contraseña se manda "tal cual" al back-end
+       * o a tu servicio Supabase, donde debe ocurrir el hashing.
+       */
       const datos: {
         nombre: string;
         correo: string;
@@ -89,12 +90,12 @@ export class RegisterPage {
       } = {
         nombre: this.nombre,
         correo: this.correo,
-        clave: hashedPassword,
+        clave: this.clave,  // Se envía sin hashear, delegamos el hash al back-end
         rol: this.rolSeleccionado,
-        direccion: this.direccion || '', // Garantizamos que sea string
-        pais: this.paisSeleccionado || '', // Garantizamos que sea string
-        region: this.regionSeleccionada || '', // Garantizamos que sea string
-        ciudad: this.ciudadSeleccionada || '', // Garantizamos que sea string
+        direccion: this.direccion || '',
+        pais: this.paisSeleccionado || '',
+        region: this.regionSeleccionada || '',
+        ciudad: this.ciudadSeleccionada || '',
         tipo_camion: this.rolSeleccionado === 'chofer' ? this.tipoCamion : undefined,
         patente: this.rolSeleccionado === 'chofer' ? this.patente : undefined,
         modelo: this.rolSeleccionado === 'chofer' ? this.modelo : undefined,

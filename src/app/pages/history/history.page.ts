@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { SupabaseService } from 'src/app/services/supabase.service';
 
 interface Trip {
   id: string;
@@ -23,41 +22,49 @@ interface Service {
   styleUrls: ['./history.page.scss'],
 })
 export class HistoryPage implements OnInit {
-  trips: Trip[] = [];
-  services: Service[] = [];
-  loadingTrips: boolean = true;
-  loadingServices: boolean = true;
+  trips: Trip[] = [
+    {
+      id: '1',
+      origen: 'Ciudad de México',
+      destino: 'Guadalajara',
+      fecha: '2024-01-10',
+      estado: 'Activo',
+      camiones: { tipo: 'Trailer', capacidad: 20 },
+    },
+    {
+      id: '2',
+      origen: 'Monterrey',
+      destino: 'Tampico',
+      fecha: '2024-02-15',
+      estado: 'Finalizado',
+      camiones: { tipo: 'Camión ligero', capacidad: 10 },
+    },
+  ];
 
-  constructor(private readonly supabaseService: SupabaseService) {}
+  services: Service[] = [
+    {
+      id: '1',
+      tipo: 'Carga Express',
+      fecha: '2024-03-12',
+      estado: 'Activo',
+    },
+    {
+      id: '2',
+      tipo: 'Paquetería',
+      fecha: '2024-04-01',
+      estado: 'Pendiente',
+    },
+  ];
 
-  async ngOnInit() {
-    try {
-      const session = await this.supabaseService.getSession();
-      if (session?.user) {
-        const rol = await this.getUserRole(session.user.id);
+  loadingTrips: boolean = false;
+  loadingServices: boolean = false;
 
-        this.loadingTrips = true;
-        const tripsResponse = await this.supabaseService.getUserTrips(session.user.id, rol);
-        this.trips = tripsResponse?.data || [];
-        this.loadingTrips = false;
-
-        this.loadingServices = true;
-        const servicesResponse = await this.supabaseService.getUserServices(session.user.id, rol);
-        this.services = servicesResponse?.data || [];
-        this.loadingServices = false;
-      }
-    } catch (error) {
-      console.error('Error al cargar la página de historial:', error);
-    }
+  constructor() {
+    // Ya no inyectamos SupabaseService
   }
 
-  private async getUserRole(userId: string): Promise<'chofer' | 'cliente'> {
-    try {
-      const response = await this.supabaseService.getUserProfile(userId, 'cliente');
-      return response.data?.rol || 'cliente';
-    } catch (error) {
-      console.warn('Error al obtener el rol. Asignando "cliente" por defecto:', error);
-      return 'cliente';
-    }
+  ngOnInit() {
+    // No se hace nada adicional; ya no se consultan datos externos
+    // Mostramos el contenido estático que está en trips y services
   }
 }

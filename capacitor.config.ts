@@ -1,9 +1,14 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'io.ionic.starter',
+  appId: 'com.transportesya.app',
   appName: 'TransportesYa',
-  webDir: 'www'
+  webDir: 'www',
+  // Otras opciones:
+  // bundledWebRuntime: false,
+  // server: {
+  //   androidScheme: 'https'
+  // }
 };
 
 export default config;
